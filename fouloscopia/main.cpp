@@ -476,41 +476,41 @@ void dynamic_information(void)
     color(120, 144, 156, 255);
     print(0, 0,  "Randoming (r):");
     color(255, 179, 0, 255);
-    print(100, 0, randoming ? "True" : "False");
+    print(110, 0, randoming ? "True" : "False");
     color(120, 144, 156, 255);
-    print(0, 14,  "Grouping (g):");
+    print(0, 16,  "Grouping (g):");
     color(255, 179, 0, 255);
-    print(100, 14, grouping ? "True" : "False");
+    print(110, 16, grouping ? "True" : "False");
     color(120, 144, 156, 255);
-    print(0, 28, "World (w):");
+    print(0, 16 * 2, "World (w):");
     color(255, 179, 0, 255);
     if (world == 0) {
-        print(100, 28, "Infinite");
+        print(110, 16 * 2, "Infinite");
     } else if (world == 1) {
-        print(100, 28, "Geometric");
+        print(110, 16 * 2, "Geometric");
     } else if (world == 2) {
-        print(100, 28, "Random");
+        print(110, 16 * 2, "Random");
     }
 
     color(120, 144, 156, 255);
-    print(160, 0,  "cohesion weight (3):");
-    dynamic_information_focus(160 + 145, 0, &cohesion_weight);
-    print(160, 14, "alignement weight (2):");
-    dynamic_information_focus(160 + 145, 14, &alignement_weight);
-    print(160, 28, "repulsion weight (1):");
-    dynamic_information_focus(160 + 145, 28, &repulsion_weight);
-    print(350, 0, "cohesion field (6):");
-    dynamic_information_focus(350 + 130, 0, &cohesion_field);
-    print(350, 14, "alignement field (5):");
-    dynamic_information_focus(350 + 130, 14, &alignement_field);
-    print(350, 28, "repulsion field (4):");
-    dynamic_information_focus(350 + 130, 28, &repulsion_field);
-    print(525, 0, "physical weight (9):");
-    dynamic_information_focus(525 + 155, 0, &physical_weight);
-    print(525, 14, "acceleration weight (8):");
-    dynamic_information_focus(525 + 155, 14, &acceleration_weight);
-    print(525, 28, "velocity weight (7):");
-    dynamic_information_focus(525 + 155, 28, &velocity_weight);
+    print(180, 0,  "cohesion weight (3):");
+    dynamic_information_focus(180 + 165, 0, &cohesion_weight);
+    print(180, 16, "alignement weight (2):");
+    dynamic_information_focus(180 + 165, 16, &alignement_weight);
+    print(180, 16 * 2, "repulsion weight (1):");
+    dynamic_information_focus(180 + 165, 16 * 2, &repulsion_weight);
+    print(400, 0, "cohesion field (6):");
+    dynamic_information_focus(350 + 200, 0, &cohesion_field);
+    print(400, 16, "alignement field (5):");
+    dynamic_information_focus(350 + 200, 16, &alignement_field);
+    print(400, 16 * 2, "repulsion field (4):");
+    dynamic_information_focus(350 + 200, 16 * 2, &repulsion_field);
+    print(600, 0, "physical weight (9):");
+    dynamic_information_focus(600 + 175, 0, &physical_weight);
+    print(600, 16, "acceleration weight (8):");
+    dynamic_information_focus(600 + 175, 16, &acceleration_weight);
+    print(600, 16 * 2, "velocity weight (7):");
+    dynamic_information_focus(600 + 175, 16 * 2, &velocity_weight);
 
 }
 
@@ -521,7 +521,7 @@ int main(void)
     winInit("Fouloscopia", MAX_X * 2, MAX_Y * 2);
     backgroundColor(0, 0, 0, 0);
     color(255, 255, 255, 255);
-    fontSize(14);
+    fontSize(16);
     srand(time(NULL));
 
     bird_init(birds, BIRD_BY_GROUP);
