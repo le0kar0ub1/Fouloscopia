@@ -1,16 +1,8 @@
-# IWGrAPiC
+# Fouloscopia
 
-Installer for the `GrAPiC` graphic library provided by [Alexandre Meyer](https://perso.liris.cnrs.fr/alexandre.meyer/grapic).
+Fouloscopia is a little Boid-like implementation with run-time parametring.
 
-The goal of this installer is to minimize the side effects and the user job while installing and using a little library like GrAPiC.
-
-This installer is working for Linux system only.
-
-## Philosophy
-
-When you want to create some projects with the library `GrAPiC` just clone this repository, install all the dependencies with a command and create your projects inside this repository.
-
-So, you don't have to install permanently the library.
+The project is lead using the `GrAPiC` graphic library provided by [Alexandre Meyer](https://perso.liris.cnrs.fr/alexandre.meyer/grapic/html/index.html).
 
 ## Dependencies
 
@@ -20,7 +12,9 @@ So, you don't have to install permanently the library.
 
 ## Install
 
-`git clone https://github.com/le0kar0ub1/IWGrAPiC.git && cd IWGrAPiC && make install`
+This installer is working for Linux system only.
+
+> git clone https://github.com/le0kar0ub1/Fouloscopia.git && cd Fouloscopia && make install
 
 Local installation handled:
   * SDL2
@@ -30,24 +24,51 @@ Local installation handled:
 
 ## Build & Run
 
-Create a project in IWGrAPiC.
+Build the executable:
 
-`make project target=$project`
+> make build target=fouloscopia
 
-You can code your project in the provided `src` directory (for each project) and put your personnal headers in the `inc` one.
+run it;
 
-then the following command to build:
+> ./fouloscopia.bin
 
-`make build target=$project`
+clean the *all* the build:
 
-and the following one to run;
+> make clean
 
-`make run target=$project` or `./project.bin`
+## About
 
-clean the *all* build:
+Runtime key trigger.
 
-`make clean`
+ Key     | Description                              | Qunatity Involved
+---------|------------------------------------------|---------------------
+`\SPACE` | Pause the bird update                    | 
+`\ESC`   | Quit the program                         |
+`\UP`    | Increase the focused quantity            | Increase by 0.2
+`\DOWN`  | Decrease the focused quantity            | Decrease by 0.2
+`w`      | modify bird world interaction            | Geometric or randomback or infinite
+`g`      | modify grouping behavior                 | boolean
+`r`      | modify randoming behavior                | boolean
+`1`      | focuse the repulsion weight quantity     | float
+`2`      | focuse the alignement weight quantity    | float
+`3`      | focuse the cohesion weight quantity      | float
+`4`      | focuse the repulsion field quantity      | float
+`5`      | focuse the alignement field quantity     | float
+`6`      | focuse the cohesion field quantity       | float
+`7`      | focuse the velocity weight quantity      | float
+`8`      | focuse the acceleration weight quantity  | float
+`9`      | focuse the physical weight quantity      | float
 
 ### Epilogue
 
 Feel free to fork, use, improve.
+
+
+
+
+
+
+
+
+
+

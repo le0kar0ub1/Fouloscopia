@@ -12,8 +12,6 @@ using namespace grapic;
 
 # define BIRD_MAX_SIZE 10 // size of one bird
 
-# define BIRD_PHYS  1 // weight of the rules, don't touch me
-
 bool grouping = false; // if true, the birds try to group
 int  world = 0; // 0 == infinite | 1 == geometric | 2 == random back
 bool updating = true; // if true, pause the update
@@ -25,6 +23,8 @@ float cohesion_field   = 20;
 
 float acceleration_weight = 1;
 float velocity_weight = 3.5;
+float physical_weight = 1.0;
+
 float repulsion_weight = 10.0;
 float alignement_weight = 1.0;
 float cohesion_weight = 0.2;
@@ -338,7 +338,7 @@ Complex bird_repulsion(BirdGroup &birds, int eval)
     }
     if (complex_get_radius(repulsion) > 0) {
         repulsion = (complex_normalize(repulsion) * velocity_weight) - birds.bird[eval].velocity;
-        repulsion = complex_stage(repulsion, BIRD_PHYS);
+        repulsion = complex_stage(repulsion, physical_weight);
     }
     return (repulsion);
 }
@@ -357,7 +357,7 @@ Complex bird_alignement(BirdGroup &birds, int eval)
     }
     if (alignement_count > 0) {
         alignement = complex_normalize(alignement / (float)alignement_count) * velocity_weight;
-        alignement = complex_stage(alignement - birds.bird[eval].velocity, BIRD_PHYS);
+        alignement = complex_stage(alignement - birds.bird[eval].velocity, physical_weight);
     }
     return (alignement);
 }
@@ -379,7 +379,7 @@ Complex bird_cohesion(BirdGroup &birds, int eval)
         cohesion = complex_init_polar(0, 0) - cohesion;
         cohesion = (complex_normalize(cohesion) * velocity_weight);
         birds.bird[eval].acc = cohesion - birds.bird[eval].velocity;
-        birds.bird[eval].acc = complex_stage(birds.bird[eval].acc, BIRD_PHYS);
+        birds.bird[eval].acc = complex_stage(birds.bird[eval].acc, physical_weight);
     }
     return (cohesion);
 }
@@ -399,7 +399,7 @@ void bird_update(BirdGroup &birds)
         Complex alignement = bird_alignement(birds, i);
         Complex cohesion = bird_cohesion(birds, i);
 
-        repulsion = repulsion * repulsion_weight;//1.5;
+        repulsion = repulsion * repulsion_weight;;
         alignement = alignement * alignement_weight;
         cohesion  = cohesion * cohesion_weight; 
 
@@ -407,7 +407,7 @@ void bird_update(BirdGroup &birds)
         birds.bird[i].acc = birds.bird[i].acc + alignement;
         birds.bird[i].acc = birds.bird[i].acc + cohesion;
         
-        birds.bird[i].acc = birds.bird[i].acc * acceleration_weight;// * 0.4;
+        birds.bird[i].acc = birds.bird[i].acc * acceleration_weight;;
         if (grouping) {
             birds.bird[i].velocity = complex_stage(birds.bird[i].velocity + birds.bird[i].acc, velocity_weight);
             birds.bird[i].pos = birds.bird[i].pos + birds.bird[i].velocity * velocity_weight;
@@ -422,8 +422,15 @@ void bird_update(BirdGroup &birds)
 /**
  * Handle the user input
  */
-void handle_input(void)
+void handle_input(BirdGroup &birds)
 {
+    if (isKeyPressed(SDLK_RETURN)) {
+        for (int i = 0; i < BIRD_BY_GROUP; i++) {
+            birds.bird[i].pos.x = 0;
+            birds.bird[i].pos.y = 0;
+        }
+    }
+
     if (isKeyPressed(SDLK_g)) {
         grouping = !grouping;
         if (grouping)
@@ -432,50 +439,37 @@ void handle_input(void)
     if (isKeyPressed(SDLK_SPACE)) {
         updating = !updating;
     }
-    if (isKeyPressed(SDLK_c) && !grouping) {
+    if (isKeyPressed(SDLK_w) && !grouping) {
         world = (world + 1) % 3;
-            
     }
     if (isKeyPressed(SDLK_r)) {
         randoming = !randoming;
     }
 
-    if (isKeyPressed(SDLK_c)) {
+    if (isKeyPressed(SDLK_3))
         input_focus = &cohesion_weight;
-    }
-    if (isKeyPressed(SDLK_3)) {
-        input_focus = &cohesion_weight;
-    }
-    if (isKeyPressed(SDLK_2)) {
+    if (isKeyPressed(SDLK_2))
         input_focus = &alignement_weight;
-    }
-    if (isKeyPressed(SDLK_1)) {
+    if (isKeyPressed(SDLK_1))
         input_focus = &repulsion_weight;
-    }
-    if (isKeyPressed(SDLK_6)) {
+    if (isKeyPressed(SDLK_6))
         input_focus = &cohesion_field;
-    }
-    if (isKeyPressed(SDLK_5)) {
+    if (isKeyPressed(SDLK_5))
         input_focus = &alignement_field;
-    }
-    if (isKeyPressed(SDLK_4)) {
+    if (isKeyPressed(SDLK_4))
         input_focus = &repulsion_field;
-    }
-    if (isKeyPressed(SDLK_8)) {
+    if (isKeyPressed(SDLK_9))
+        input_focus = &physical_weight;
+    if (isKeyPressed(SDLK_8))
         input_focus = &acceleration_weight;
-    }
-    if (isKeyPressed(SDLK_7)) {
+    if (isKeyPressed(SDLK_7))
         input_focus = &velocity_weight;
-    }
 
-    if (isKeyPressed(SDLK_UP)) {
+    if (isKeyPressed(SDLK_UP))
         *input_focus += 0.2;
-    }
-    if (isKeyPressed(SDLK_DOWN)) {
-        if (*input_focus > 0.2) {
+    if (isKeyPressed(SDLK_DOWN))
+        if (*input_focus > 0.2)
             *input_focus -= 0.2;
-        }
-    }
 
 }
 
@@ -530,10 +524,12 @@ void dynamic_information(void)
     dynamic_information_focus(350 + 130, 14, &alignement_field);
     print(350, 28, "repulsion field (4):");
     dynamic_information_focus(350 + 130, 28, &repulsion_field);
-    print(525, 0, "acceleration weight (8):");
-    dynamic_information_focus(525 + 155, 0, &acceleration_weight);
-    print(525, 14, "velocity weight (7):");
-    dynamic_information_focus(525 + 155, 14, &velocity_weight);
+    print(525, 0, "physical weight (9):");
+    dynamic_information_focus(525 + 155, 0, &physical_weight);
+    print(525, 14, "acceleration weight (8):");
+    dynamic_information_focus(525 + 155, 14, &acceleration_weight);
+    print(525, 28, "velocity weight (7):");
+    dynamic_information_focus(525 + 155, 28, &velocity_weight);
 
 }
 
@@ -560,7 +556,7 @@ int main(void)
             delay(1);
         }
         bird_draw(birds); // finally draw
-        handle_input(); // handle user inputs
+        handle_input(birds); // handle user inputs
         dynamic_information(); // display the dynamic information for the user
         winDisplay();
     }
