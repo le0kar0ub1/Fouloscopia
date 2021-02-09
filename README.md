@@ -60,6 +60,10 @@ Runtime key trigger.
 `8`      | focuse the acceleration weight quantity  | float
 `9`      | focuse the physical weight quantity      | float
 
+## Sampling
+
+![Sample](doc/sample.gif)
+
 ### Epilogue
 
 Feel free to fork, use, improve.
