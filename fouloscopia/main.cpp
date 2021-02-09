@@ -443,7 +443,6 @@ void handle_input(void)
     if (isKeyPressed(SDLK_c)) {
         input_focus = &cohesion_weight;
     }
-
     if (isKeyPressed(SDLK_3)) {
         input_focus = &cohesion_weight;
     }
@@ -480,18 +479,18 @@ void handle_input(void)
 
 }
 
-void hdl(int x, int y, float *cur)
+void dynamic_information_focus(int x, int y, float *cur)
 {
     char buf[10];
 
     if (cur == input_focus) {
         color(255, 0, 0, 255);
+    } else {
+        color(255, 179, 0, 255);
     }
     snprintf(buf, 10, "%.1f", *cur);
     print(x, y, buf);
-    if (cur == input_focus) {
-        color(255, 255, 255, 255);
-    }
+    color(120, 144, 156, 255);
 }
 
 /**
@@ -499,34 +498,42 @@ void hdl(int x, int y, float *cur)
  */
 void dynamic_information(void)
 {
-    // char buf[10];
-
-    print(0, MAX_Y * 2 - 16,  randoming ? "Randoming (r): True" : "Randoming (r): False");
-    print(0, MAX_Y * 2 - 30,  grouping ?  "Grouping  (g): True" : "Grouping  (g): False");
+    color(120, 144, 156, 255);
+    print(0, 0,  "Randoming (r):");
+    color(255, 179, 0, 255);
+    print(100, 0, randoming ? "True" : "False");
+    color(120, 144, 156, 255);
+    print(0, 14,  "Grouping (g):");
+    color(255, 179, 0, 255);
+    print(100, 14, grouping ? "True" : "False");
+    color(120, 144, 156, 255);
+    print(0, 28, "World (w):");
+    color(255, 179, 0, 255);
     if (world == 0) {
-        print(0, MAX_Y * 2 - 44, "World (w): Infinite");
+        print(100, 28, "Infinite");
     } else if (world == 1) {
-        print(0, MAX_Y * 2 - 44, "World (w): Geometric");
+        print(100, 28, "Geometric");
     } else if (world == 2) {
-        print(0, MAX_Y * 2 - 44, "World (w): Random");
+        print(100, 28, "Random");
     }
 
-    print(0, 0,  "cohesion weight (3):");
-    hdl(0 + 145, 0, &cohesion_weight);
-    print(0, 14, "alignement weight (2):");
-    hdl(0 + 145, 14, &alignement_weight);
-    print(0, 28, "repulsion weight (1):");
-    hdl(0 + 145, 28, &repulsion_weight);
-    print(190, 0, "cohesion field (6):");
-    hdl(190 + 130, 0, &cohesion_field);
-    print(190, 14, "alignement field (5):");
-    hdl(190 + 130, 14, &alignement_field);
-    print(190, 28, "repulsion field (4):");
-    hdl(190 + 130, 28, &repulsion_field);
-    print(365, 0, "acceleration weight (8):");
-    hdl(365 + 155, 0, &acceleration_weight);
-    print(365, 14, "velocity weight (7):");
-    hdl(365 + 155, 14, &velocity_weight);
+    color(120, 144, 156, 255);
+    print(160, 0,  "cohesion weight (3):");
+    dynamic_information_focus(160 + 145, 0, &cohesion_weight);
+    print(160, 14, "alignement weight (2):");
+    dynamic_information_focus(160 + 145, 14, &alignement_weight);
+    print(160, 28, "repulsion weight (1):");
+    dynamic_information_focus(160 + 145, 28, &repulsion_weight);
+    print(350, 0, "cohesion field (6):");
+    dynamic_information_focus(350 + 130, 0, &cohesion_field);
+    print(350, 14, "alignement field (5):");
+    dynamic_information_focus(350 + 130, 14, &alignement_field);
+    print(350, 28, "repulsion field (4):");
+    dynamic_information_focus(350 + 130, 28, &repulsion_field);
+    print(525, 0, "acceleration weight (8):");
+    dynamic_information_focus(525 + 155, 0, &acceleration_weight);
+    print(525, 14, "velocity weight (7):");
+    dynamic_information_focus(525 + 155, 14, &velocity_weight);
 
 }
 
