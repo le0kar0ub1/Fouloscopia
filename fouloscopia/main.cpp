@@ -112,22 +112,6 @@ float complex_get_radius(Complex a)
     return ((float)sqrt(pow(a.x, 2) + pow(a.y, 2)));
 }
 
-float complex_get_angle_diff(Complex a, Complex b)
-{
-    double base;
-
-    if ((a.x == 0 && a.y == 0) || (b.x == 0 && b.y == 0)) {
-        return (0.0);
-    }
-    base = (a.x * b.x + a.y * b.y) / (complex_get_radius(a) * complex_get_radius(b));
-    if (base <= -1) {
-        return (M_PI);
-    } else if (base >= 1) {
-        return (0);
-    }
-    return ((float)acos(base));
-}
-
 float complex_get_distance_diff(Complex a, Complex b)
 {
     return ((float)sqrt(pow(a.x - b.x, 2) + pow(a.y - b.y, 2)));
@@ -430,20 +414,17 @@ void handle_input(BirdGroup &birds)
             birds.bird[i].pos.y = 0;
         }
     }
+    if (isKeyPressed(SDLK_SPACE))
+        updating = !updating;
 
+    if (isKeyPressed(SDLK_w) && !grouping)
+        world = (world + 1) % 3;
+    if (isKeyPressed(SDLK_r))
+        randoming = !randoming;
     if (isKeyPressed(SDLK_g)) {
         grouping = !grouping;
         if (grouping)
             world = 0;
-    }
-    if (isKeyPressed(SDLK_SPACE)) {
-        updating = !updating;
-    }
-    if (isKeyPressed(SDLK_w) && !grouping) {
-        world = (world + 1) % 3;
-    }
-    if (isKeyPressed(SDLK_r)) {
-        randoming = !randoming;
     }
 
     if (isKeyPressed(SDLK_3))

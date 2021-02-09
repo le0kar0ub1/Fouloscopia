@@ -43,6 +43,7 @@ Runtime key trigger.
  Key     | Description                              | Qunatity Involved
 ---------|------------------------------------------|---------------------
 `\SPACE` | Pause the bird update                    | 
+`\ENTRY` | Reset all the bird position to 0         | 
 `\ESC`   | Quit the program                         |
 `\UP`    | Increase the focused quantity            | Increase by 0.2
 `\DOWN`  | Decrease the focused quantity            | Decrease by 0.2
