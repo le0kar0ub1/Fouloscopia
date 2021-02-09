@@ -1,0 +1,2 @@
+# Fouloscopia
+Boid-like simulation
