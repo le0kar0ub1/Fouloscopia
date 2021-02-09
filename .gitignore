@@ -1,3 +1,10 @@
+mktoolchain/build
+build
+mktoolchain/toolchain
+data
+*.bin
+
+### C++ ###
 # Prerequisites
 *.d
 

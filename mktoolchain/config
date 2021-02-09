@@ -1,0 +1,12 @@
+LIB_GRAPIC_VERSION="1.2.95"
+LIB_GRAPIC_ENDPOINT="https://perso.liris.cnrs.fr/alexandre.meyer/grapic/download/grapic-$LIB_GRAPIC_VERSION-Linux.tgz"
+
+LIB_SDL_VERSION="2.0.12"
+LIB_SDL_ENDPOINT="http://www.libsdl.org/release/SDL2-$LIB_SDL_VERSION.tar.gz"
+
+LIB_SDL_TTF_VERSION="2.0.15"
+LIB_SDL_TTF_ENDPOINT="https://www.libsdl.org/projects/SDL_ttf/release/SDL2_ttf-$LIB_SDL_TTF_VERSION.tar.gz"
+
+LIB_SDL_IMAGE_VERSION="2.0.5"
+LIB_SDL_IMAGE_ENDPOINT="https://www.libsdl.org/projects/SDL_image/release/SDL2_image-$LIB_SDL_IMAGE_VERSION.tar.gz"
+

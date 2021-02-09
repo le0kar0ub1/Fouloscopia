@@ -1,0 +1,42 @@
+#!/bin/sh
+
+### Environment ################################################################
+MKTOOL=$(realpath $(dirname $0))
+SOURCE=$(dirname $(dirname $(realpath $0)))
+TARGET="toolchain"
+printf "[\e[36;1mTOOL\e[0m] Toolchain Builder\n"
+printf "[\e[34;1mINFO\e[0m] Building from $SOURCE...\n"
+
+
+### Workflow ###################################################################
+
+function RAISE() {
+    printf "fatal error occured\n"
+    rm -rf $TARGET
+    exit 1
+}
+
+trap RAISE EXIT
+
+### Dependencies ###############################################################
+source $MKTOOL/build-helper.sh
+source $MKTOOL/install-handler.sh
+source $MKTOOL/config
+
+require make
+require curl
+require g++
+
+### Build #####################################################################
+
+install_preliminaries
+install_sdl_master
+install_sdl_ttf
+install_sdl_image
+install_grapic
+compile_grapic
+
+### We're done! ################################################################
+trap - EXIT
+
+printf "[\e[36;1mTOOL\e[0m] Toolchain built!\n"
