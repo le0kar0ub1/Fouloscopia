@@ -29,7 +29,17 @@ float repulsion_weight = 10.0;
 float alignement_weight = 1.0;
 float cohesion_weight = 0.2;
 
-float *input_focus = &repulsion_field;
+float propagation_probability = 0.4;
+float radius_propagation = 5;
+float immunity_weight = 0.9;
+float deathrate = 0.01;
+
+float bird_clean = BIRD_BY_GROUP - 1;
+float bird_infected = 1;
+float bird_immune = 0;
+float bird_dead = 0;
+
+float *input_focus = &propagation_probability;
 
 struct Color
 {
@@ -38,6 +48,17 @@ struct Color
     int b;
     int a;
 };
+
+Color color_init(int r, int g, int b, int a)
+{
+    Color color = {
+        .r = r,
+        .g = g,
+        .b = b,
+        .a = a
+    };
+    return (color);
+}
 
 struct Complex
 {
@@ -138,6 +159,21 @@ Complex complex_normalize(Complex a)
     return (a);
 }
 
+enum BIRD_HEALTH
+{
+    CLEAN = 0,
+    INFECTED = 1,
+    DEAD = 2,
+    IMMUNE = 3
+};
+
+struct Health
+{
+    enum BIRD_HEALTH state;
+    float immunity;
+    int contamination_clock;
+};
+
 struct Bird
 {
     int deg;
@@ -145,6 +181,7 @@ struct Bird
     Complex pos;
     Complex velocity;
     Complex acc;
+    Health health;
 };
 
 struct BirdGroup
@@ -158,12 +195,7 @@ struct BirdGroup
  */
 void bird_init(BirdGroup &birds, int nb)
 {
-    Color color = {
-        .r = 255,
-        .g = 255,
-        .b = 255,
-        .a = 255
-    };
+    Color color = color_init(255, 255, 255, 255);
 
     for (int i = 0; i < nb; i++) {
         birds.bird[i].pos.x = 0;
@@ -182,6 +214,8 @@ void bird_init(BirdGroup &birds, int nb)
 void bird_draw(BirdGroup &birds)
 {
     for (int i = 0; i < birds.nb; i++) {
+        if (birds.bird[i].health.state == DEAD)
+            continue;
         int deg;
         if (grouping) {
             deg = ((int)complex_get_angle(birds.bird[i].velocity) + 90) % 360;
@@ -427,6 +461,19 @@ void handle_input(BirdGroup &birds)
             world = 0;
     }
 
+    if (isKeyPressed(SDLK_a)) {
+        input_focus = &propagation_probability;
+    }
+    if (isKeyPressed(SDLK_b)) {
+        input_focus = &radius_propagation;
+    }
+    if (isKeyPressed(SDLK_c)) {
+        input_focus = &immunity_weight;
+    }
+    if (isKeyPressed(SDLK_d)) {
+        input_focus = &deathrate;
+    }
+
     if (isKeyPressed(SDLK_3))
         input_focus = &cohesion_weight;
     if (isKeyPressed(SDLK_2))
@@ -463,7 +510,7 @@ void dynamic_information_focus(int x, int y, float *cur)
     } else {
         color(255, 179, 0, 255);
     }
-    snprintf(buf, 10, "%.1f", *cur);
+    snprintf(buf, 10, "%.2f", *cur);
     print(x, y, buf);
     color(120, 144, 156, 255);
 }
@@ -471,7 +518,7 @@ void dynamic_information_focus(int x, int y, float *cur)
 /**
  * Display dynamic informations
  */
-void dynamic_information(void)
+void dynamic_simulation_information(void)
 {
     color(120, 144, 156, 255);
     print(0, 0,  "Randoming (r):");
@@ -514,8 +561,80 @@ void dynamic_information(void)
 
 }
 
+void dynamic_health_information(BirdGroup &birds)
+{
+    color(120, 144, 156, 255);
+    print(0, MAX_Y * 2 - 16 - 2, "Clean: ");
+    dynamic_information_focus(80, MAX_Y * 2 - 16 - 2, &bird_clean);
+    print(0, MAX_Y * 2 - 16 * 2 - 2, "Infected: ");
+    dynamic_information_focus(80, MAX_Y * 2 - 16 * 2 - 2, &bird_infected);
+    print(0, MAX_Y * 2 - 16 * 3 - 2, "Immune: ");
+    dynamic_information_focus(80, MAX_Y * 2 - 16 * 3 - 2, &bird_immune);
+    print(0, MAX_Y * 2 - 16 * 4 - 2, "Dead: ");
+    dynamic_information_focus(80, MAX_Y * 2 - 16 * 4 - 2, &bird_dead);
+
+    print(0 + 135, MAX_Y * 2 - 16 * 1 - 2, "R0 (a): ");
+    dynamic_information_focus(110 + 135, MAX_Y * 2 - 16 * 1 - 2, &propagation_probability);
+    print(0 + 135, MAX_Y * 2 - 16 * 2 - 2, "Radius (b): ");
+    dynamic_information_focus(110 + 135, MAX_Y * 2 - 16 * 2 - 2, &radius_propagation);
+    print(0 + 135, MAX_Y * 2 - 16 * 3 - 2, "Immunity (c): ");
+    dynamic_information_focus(110 + 135, MAX_Y * 2 - 16 * 3 - 2, &immunity_weight);
+    print(0 + 135, MAX_Y * 2 - 16 * 4 - 2, "deathrate (d): ");
+    dynamic_information_focus(110 + 135, MAX_Y * 2 - 16 * 4 - 2, &deathrate);
+
+}
+
+bool propagation_random(float max, float proba)
+{
+    return ((rand() % (int)max) < (int)(proba * max));
+}
+
+void update_health(BirdGroup &birds)
+{
+    for (int i = 0; i < birds.nb; i++) {
+        switch (birds.bird[i].health.state)
+        {
+            case INFECTED: // infect others and die if no chance :(
+            {
+                for (int j = 0; j < birds.nb; j++) {
+                    if (birds.bird[j].health.state == CLEAN || (birds.bird[j].health.state == IMMUNE && !propagation_random(100, immunity_weight))) {
+                        float dist = complex_get_distance_diff(birds.bird[i].pos, birds.bird[j].pos);
+                        if (dist < radius_propagation && propagation_random(100, propagation_probability / 5)) {
+                                if (birds.bird[j].health.state == CLEAN)
+                                    bird_clean -= 1;
+                                else if (birds.bird[j].health.state == IMMUNE)
+                                    bird_immune -= 1;
+                                birds.bird[j].health.state = INFECTED;
+                                bird_infected += 1;
+                                birds.bird[j].color = color_init(255, 0, 0, 255);
+                            }
+                        }
+                    }
+                }
+                if (propagation_random(100, deathrate)) {
+                    birds.bird[i].health.state = DEAD;
+                    bird_infected -= 1;
+                    bird_dead += 1;
+                } else if (birds.bird[i].health.contamination_clock++ == 100) {
+                    birds.bird[i].health.contamination_clock = 0;
+                    birds.bird[i].health.state = IMMUNE;
+                    bird_immune += 1;
+                    bird_infected -= 1;
+                    birds.bird[i].color = color_init(0, 255, 0, 255);
+                }       
+                break;
+            case IMMUNE: // make it simple and keep immunity forever, in fact it's obv not the case
+            case CLEAN: // clean bird make nothing
+            case DEAD: // dead bird can't revive
+            default:
+                break;
+        }
+    }
+}
+
 int main(void)
 {
+    int clock = 0;
     BirdGroup birds;
 
     winInit("Fouloscopia", MAX_X * 2, MAX_Y * 2);
@@ -526,6 +645,8 @@ int main(void)
 
     bird_init(birds, BIRD_BY_GROUP);
 
+    birds.bird[rand() % BIRD_BY_GROUP].health.state = INFECTED;
+
     while (!isKeyPressed(SDLK_ESCAPE)) {
         winClear();
         if (updating) {
@@ -535,10 +656,15 @@ int main(void)
             bird_update(birds); // update the bird position
             bird_handle_world(birds); // handle world depending on given rules
             delay(1);
+            if ((int)SDL_GetTicks() / 400 > clock) { // ~ 2.5 times by second
+                update_health(birds);
+                clock++;
+            }
         }
         bird_draw(birds); // finally draw
+        dynamic_health_information(birds); // display bird health information
+        dynamic_simulation_information(); // display the dynamic information for the user
         handle_input(birds); // handle user inputs
-        dynamic_information(); // display the dynamic information for the user
         winDisplay();
     }
 
