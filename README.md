@@ -26,7 +26,7 @@ Local installation handled:
 
 Build the executable:
 
-> make build target=fouloscopia
+> make build
 
 run it;
 
@@ -38,15 +38,21 @@ clean the *all* the build:
 
 ## About
 
-Runtime key trigger.
+Runtime basic key trigger.
 
- Key     | Description                              | Qunatity Involved
+ Key     | Description                           
+---------|------------------------------------------
+`\SPACE` | Pause the bird update                     
+`\ENTRY` | Reset all the bird position to 0         
+`\ESC`   | Quit the program                        
+`\UP`    | Increase the focused quantity            
+`\DOWN`  | Decrease the focused quantity            
+
+
+Runtime bird behavior.
+
+ Key     | Description                              | Quantity Involved
 ---------|------------------------------------------|---------------------
-`\SPACE` | Pause the bird update                    | 
-`\ENTRY` | Reset all the bird position to 0         | 
-`\ESC`   | Quit the program                         |
-`\UP`    | Increase the focused quantity            | Increase by 0.2
-`\DOWN`  | Decrease the focused quantity            | Decrease by 0.2
 `w`      | modify bird world interaction            | Geometric or randomback or infinite
 `g`      | modify grouping behavior                 | boolean
 `r`      | modify randoming behavior                | boolean
@@ -59,6 +65,17 @@ Runtime key trigger.
 `7`      | focuse the velocity weight quantity      | float
 `8`      | focuse the acceleration weight quantity  | float
 `9`      | focuse the physical weight quantity      | float
+
+Runtime bird health.
+
+ Key     | Description                                                      | Quantity Involved
+---------|------------------------------------------------------------------|---------------------
+`a`      | focuse the r0 quantity between 0 and 1                           | float
+`b`      | focuse the radius quantity (minimal distance for propagation)    | float
+`c`      | focuse the immunity weight quantity between 0 and 1              | float
+`d`      | focuse the death rate quantity between 0 and 1                   | float
+
+
 
 ## Sampling
 

@@ -1,5 +1,7 @@
 CXX		:=	g++
 
+target  := fouloscopia
+
 TARGET	:=	$(target).bin
 
 BUILDIR	:=	target/$(target)
