@@ -10,8 +10,6 @@ using namespace grapic;
 
 # define BIRD_BY_GROUP 300 // number of bird by group
 
-# define BIRD_MAX_SIZE 10 // size of one bird
-
 bool grouping = true; // if true, the birds try to group
 int  world = 0; // 0 == infinite | 1 == geometric | 2 == random back
 bool updating = true; // if true, pause the update
@@ -19,31 +17,34 @@ bool randoming = true; // if true, put random in brid move
 
 struct Quantity // value which user can modulate
 {
-    float value; // the value
+    float val; // the value
     float mod; // increase/decrease by mod step
 };
 
-Quantity repulsion_field  = {.value = 20, .mod = 1};
-Quantity alignement_field = {.value = 50, .mod = 1};
-Quantity cohesion_field   = {.value = 20, .mod = 1};
+Quantity bird_size = {.val = 10, .mod = 1}; // size of one bird
 
-Quantity acceleration_weight = {.value = 1, .mod = 0.2};
-Quantity velocity_weight     = {.value = 3.5, .mod = 0.2};
-Quantity physical_weight     = {.value = 1.0, .mod = 0.2};
+Quantity repulsion_field  = {.val = 20, .mod = 1}; // field of action of the behavior
+Quantity alignement_field = {.val = 50, .mod = 1}; // field of action of the behavior
+Quantity cohesion_field   = {.val = 20, .mod = 1}; // field of action of the behavior
 
-Quantity repulsion_weight  = {.value = 10.0, .mod = 0.2};
-Quantity alignement_weight = {.value = 1.0, .mod = 0.2};
-Quantity cohesion_weight   = {.value = 0.2, .mod = 0.2};
+Quantity acceleration_weight = {.val = 1, .mod = 0.2};
+Quantity velocity_weight     = {.val = 3.5, .mod = 0.2};
+Quantity physical_weight     = {.val = 1.0, .mod = 0.2};
 
-Quantity propagation_probability = {.value = 0.5, .mod = 0.02};
-Quantity radius_propagation = {.value = 15, .mod = 1};
-Quantity immunity_weight = {.value = 0.90, .mod = 0.02};
-Quantity deathrate = {.value = 0.04, .mod = 0.02};
+Quantity repulsion_weight  = {.val = 10.0, .mod = 0.5};
+Quantity alignement_weight = {.val = 1.0, .mod = 0.5};
+Quantity cohesion_weight   = {.val = 0.2, .mod = 0.5};
 
-Quantity bird_clean = {.value = BIRD_BY_GROUP - 1, .mod = 0};
-Quantity bird_infected = {.value = 1, .mod = 0};
-Quantity bird_immune = {.value = 0, .mod = 0};
-Quantity bird_dead = {.value = 0, .mod = 0};
+Quantity propagation_probability = {.val = 2, .mod = 0.2};
+Quantity radius_propagation = {.val = 20, .mod = 1};
+Quantity immunity_weight = {.val = 0.90, .mod = 0.02};
+Quantity deathrate = {.val = 0.4, .mod = 0.02};
+Quantity infection_duration = {.val = 20, .mod = 2 };
+
+Quantity bird_clean = {.val = BIRD_BY_GROUP - 1, .mod = 0};
+Quantity bird_infected = {.val = 1, .mod = 0};
+Quantity bird_immune = {.val = 0, .mod = 0};
+Quantity bird_dead = {.val = 0, .mod = 0};
 
 Quantity *input_focus = &propagation_probability;
 
@@ -165,7 +166,7 @@ Complex complex_normalize(Complex a)
     return (a);
 }
 
-enum BIRD_HEALTH
+enum BIRD_HEALTH_STATE
 {
     CLEAN = 0,
     INFECTED = 1,
@@ -175,7 +176,7 @@ enum BIRD_HEALTH
 
 struct Health
 {
-    enum BIRD_HEALTH state;
+    enum BIRD_HEALTH_STATE state;
     int infected_clock;
 };
 
@@ -229,9 +230,9 @@ void bird_draw(BirdGroup &birds)
         } else {
             deg = birds.bird[i].deg + 180;
         }
-        Complex p2 = complex_init_polar(BIRD_MAX_SIZE, (deg - BIRD_MAX_SIZE * 2) % 360);
+        Complex p2 = complex_init_polar(bird_size.val, (deg - (int)bird_size.val * 2) % 360);
         p2 = p2 + birds.bird[i].pos;
-        Complex p3 = complex_init_polar(BIRD_MAX_SIZE, (deg + BIRD_MAX_SIZE * 2) % 360);
+        Complex p3 = complex_init_polar(bird_size.val, (deg + (int)bird_size.val * 2) % 360);
         p3 = p3 + birds.bird[i].pos;
         color(birds.bird[i].color.r, birds.bird[i].color.g, birds.bird[i].color.b, birds.bird[i].color.a);
         triangleFill(
@@ -248,19 +249,19 @@ void bird_draw(BirdGroup &birds)
 void bird_handle_world_randomback(Bird &bird)
 {
     int randomed = (rand() % 90) - 45;
-    if (bird.pos.x < (-MAX_X + BIRD_MAX_SIZE)) {
+    if (bird.pos.x < (-MAX_X + bird_size.val)) {
         if ((bird.deg >= 90 && bird.deg <= 180) || (bird.deg >= 180 && bird.deg <= 270)) {
             bird.deg = ((bird.deg + 180 + randomed) % 360);
         }
-    } else if (bird.pos.y > (MAX_Y - BIRD_MAX_SIZE))  {
+    } else if (bird.pos.y > (MAX_Y - bird_size.val))  {
         if ((bird.deg >= 90 && bird.deg <= 180) || (bird.deg > 0 && bird.deg < 90)) {
             bird.deg = ((bird.deg + 180 + randomed) % 360);
         }
-    } else if (bird.pos.y < (-MAX_Y + BIRD_MAX_SIZE)) {
+    } else if (bird.pos.y < (-MAX_Y + bird_size.val)) {
         if ((bird.deg >= 180 && bird.deg <= 270) || (bird.deg >= 270 && bird.deg <= 360)) {
             bird.deg = ((bird.deg + 180 + randomed) % 360);
         }
-    } else if (bird.pos.x > (MAX_X - BIRD_MAX_SIZE)) {
+    } else if (bird.pos.x > (MAX_X - bird_size.val)) {
         if ((bird.deg >= 0 && bird.deg <= 90) || (bird.deg >= 270 && bird.deg <= 360)) {
             bird.deg = ((bird.deg + 180 + randomed) % 360);
         }
@@ -272,25 +273,25 @@ void bird_handle_world_randomback(Bird &bird)
  */
 void bird_handle_world_geometric(Bird &bird)
 {
-    if (bird.pos.x < (-MAX_X + BIRD_MAX_SIZE)) {
+    if (bird.pos.x < (-MAX_X + bird_size.val)) {
         if (bird.deg >= 90 && bird.deg <= 180) {
             bird.deg = (bird.deg - 90) % 360;
         } else if (bird.deg >= 180 && bird.deg <= 270) {
             bird.deg = (bird.deg + 90) % 360;
         }
-    } else if (bird.pos.y > (MAX_Y - BIRD_MAX_SIZE))  {
+    } else if (bird.pos.y > (MAX_Y - bird_size.val))  {
         if (bird.deg >= 90 && bird.deg <= 180) {
             bird.deg = (bird.deg + 90) % 360;
         } else if (bird.deg > 0 && bird.deg < 90) {
             bird.deg = 360 + (bird.deg - 90);
         }
-    } else if (bird.pos.y < (-MAX_Y + BIRD_MAX_SIZE)) {
+    } else if (bird.pos.y < (-MAX_Y + bird_size.val)) {
         if (bird.deg >= 180 && bird.deg <= 270) {
             bird.deg = (bird.deg - 90) % 360;
         } else if (bird.deg >= 270 && bird.deg <= 360) {
             bird.deg = (bird.deg + 90) % 360;
         }
-    } else if (bird.pos.x > (MAX_X - BIRD_MAX_SIZE)) {
+    } else if (bird.pos.x > (MAX_X - bird_size.val)) {
         if (bird.deg >= 0 && bird.deg <= 90) {
             bird.deg = (bird.deg + 90) % 360;
         } else if (bird.deg >= 270 && bird.deg <= 360) {
@@ -353,7 +354,7 @@ Complex bird_repulsion(BirdGroup &birds, int eval)
 
     for (int i = 0; i < birds.nb; i++) {
         float dist = complex_get_distance_diff(birds.bird[i].pos, birds.bird[eval].pos);
-        if (dist > 0 && dist < repulsion_field.value) {
+        if (dist > 0 && dist < repulsion_field.val) {
             repulsion = repulsion + (complex_normalize(birds.bird[eval].pos - birds.bird[i].pos) / dist);
             repulsion_count++;
         }
@@ -362,8 +363,8 @@ Complex bird_repulsion(BirdGroup &birds, int eval)
         repulsion = repulsion / (float)repulsion_count;
     }
     if (complex_get_radius(repulsion) > 0) {
-        repulsion = (complex_normalize(repulsion) * velocity_weight.value) - birds.bird[eval].velocity;
-        repulsion = complex_stage(repulsion, physical_weight.value);
+        repulsion = (complex_normalize(repulsion) * velocity_weight.val) - birds.bird[eval].velocity;
+        repulsion = complex_stage(repulsion, physical_weight.val);
     }
     return (repulsion);
 }
@@ -375,14 +376,14 @@ Complex bird_alignement(BirdGroup &birds, int eval)
 
     for (int i = 0; i < birds.nb; i++) {
         float dist = complex_get_distance_diff(birds.bird[i].pos, birds.bird[eval].pos);
-        if (dist > 0 && dist < alignement_field.value) {
+        if (dist > 0 && dist < alignement_field.val) {
             alignement = alignement + birds.bird[i].velocity;
             alignement_count++;
         }
     }
     if (alignement_count > 0) {
-        alignement = complex_normalize(alignement / (float)alignement_count) * velocity_weight.value;
-        alignement = complex_stage(alignement - birds.bird[eval].velocity, physical_weight.value);
+        alignement = complex_normalize(alignement / (float)alignement_count) * velocity_weight.val;
+        alignement = complex_stage(alignement - birds.bird[eval].velocity, physical_weight.val);
     }
     return (alignement);
 }
@@ -394,7 +395,7 @@ Complex bird_cohesion(BirdGroup &birds, int eval)
 
     for (int i = 0; i < birds.nb; i++) {;
         float dist = complex_get_distance_diff(birds.bird[i].pos, birds.bird[eval].pos);
-        if (dist > 0 && dist < cohesion_field.value) {;
+        if (dist > 0 && dist < cohesion_field.val) {;
             cohesion = cohesion + birds.bird[i].pos;
             cohesion_count++;
         }
@@ -402,9 +403,9 @@ Complex bird_cohesion(BirdGroup &birds, int eval)
     if (cohesion_count > 0) {
         cohesion = cohesion / (float)cohesion_count;
         cohesion = complex_init_polar(0, 0) - cohesion;
-        cohesion = (complex_normalize(cohesion) * velocity_weight.value);
+        cohesion = (complex_normalize(cohesion) * velocity_weight.val);
         birds.bird[eval].acc = cohesion - birds.bird[eval].velocity;
-        birds.bird[eval].acc = complex_stage(birds.bird[eval].acc, physical_weight.value);
+        birds.bird[eval].acc = complex_stage(birds.bird[eval].acc, physical_weight.val);
     }
     return (cohesion);
 }
@@ -424,20 +425,20 @@ void bird_update(BirdGroup &birds)
         Complex alignement = bird_alignement(birds, i);
         Complex cohesion = bird_cohesion(birds, i);
 
-        repulsion = repulsion * repulsion_weight.value;
-        alignement = alignement * alignement_weight.value;
-        cohesion  = cohesion * cohesion_weight.value; 
+        repulsion = repulsion * repulsion_weight.val;
+        alignement = alignement * alignement_weight.val;
+        cohesion  = cohesion * cohesion_weight.val; 
 
         birds.bird[i].acc = birds.bird[i].acc + repulsion;
         birds.bird[i].acc = birds.bird[i].acc + alignement;
         birds.bird[i].acc = birds.bird[i].acc + cohesion;
         
-        birds.bird[i].acc = birds.bird[i].acc * acceleration_weight.value;
+        birds.bird[i].acc = birds.bird[i].acc * acceleration_weight.val;
         if (grouping) {
-            birds.bird[i].velocity = complex_stage(birds.bird[i].velocity + birds.bird[i].acc, velocity_weight.value);
-            birds.bird[i].pos = birds.bird[i].pos + birds.bird[i].velocity * velocity_weight.value;
+            birds.bird[i].velocity = complex_stage(birds.bird[i].velocity + birds.bird[i].acc, velocity_weight.val);
+            birds.bird[i].pos = birds.bird[i].pos + birds.bird[i].velocity * velocity_weight.val;
         } else {
-            birds.bird[i].velocity = complex_init_polar(velocity_weight.value, birds.bird[i].deg);
+            birds.bird[i].velocity = complex_init_polar(velocity_weight.val, birds.bird[i].deg);
             birds.bird[i].pos = birds.bird[i].pos + birds.bird[i].velocity;
         }
         birds.bird[i].acc = birds.bird[i].acc * 0;
@@ -449,12 +450,11 @@ void bird_update(BirdGroup &birds)
  */
 void handle_input(BirdGroup &birds)
 {
-    if (isKeyPressed(SDLK_RETURN)) {
+    if (isKeyPressed(SDLK_RETURN))
         for (int i = 0; i < BIRD_BY_GROUP; i++) {
             birds.bird[i].pos.x = 0;
             birds.bird[i].pos.y = 0;
         }
-    }
     if (isKeyPressed(SDLK_SPACE))
         updating = !updating;
 
@@ -468,18 +468,16 @@ void handle_input(BirdGroup &birds)
             world = 0;
     }
 
-    if (isKeyPressed(SDLK_a)) {
+    if (isKeyPressed(SDLK_a))
         input_focus = &propagation_probability;
-    }
-    if (isKeyPressed(SDLK_b)) {
+    if (isKeyPressed(SDLK_b))
         input_focus = &radius_propagation;
-    }
-    if (isKeyPressed(SDLK_c)) {
+    if (isKeyPressed(SDLK_c))
         input_focus = &immunity_weight;
-    }
-    if (isKeyPressed(SDLK_d)) {
+    if (isKeyPressed(SDLK_d))
         input_focus = &deathrate;
-    }
+    if (isKeyPressed(SDLK_e))
+        input_focus = &infection_duration;
 
     if (isKeyPressed(SDLK_3))
         input_focus = &cohesion_weight;
@@ -501,10 +499,10 @@ void handle_input(BirdGroup &birds)
         input_focus = &velocity_weight;
 
     if (isKeyPressed(SDLK_UP))
-        input_focus->value += input_focus->mod;
+        input_focus->val += input_focus->mod;
     if (isKeyPressed(SDLK_DOWN))
-        if (input_focus->value > input_focus->mod)
-            input_focus->value -= input_focus->mod;
+        if (input_focus->val > input_focus->mod)
+            input_focus->val -= input_focus->mod;
 
 }
 
@@ -518,11 +516,11 @@ void dynamic_information_focus(int x, int y, Quantity *cur)
         color(255, 179, 0, 255);
     }
     if (cur->mod >= 1 || cur->mod == 0)
-        snprintf(buf, 10, "%.0f", cur->value);
+        snprintf(buf, 10, "%.0f", cur->val);
     else if (cur->mod >= 0.1)
-        snprintf(buf, 10, "%.1f", cur->value);
+        snprintf(buf, 10, "%.1f", cur->val);
     else
-        snprintf(buf, 10, "%.2f", cur->value);
+        snprintf(buf, 10, "%.2f", cur->val);
     print(x, y, buf);
     color(120, 144, 156, 255);
 }
@@ -594,6 +592,9 @@ void dynamic_health_information(void)
     print(0 + 135, MAX_Y * 2 - 16 * 4 - 2, "death rate (d): ");
     dynamic_information_focus(110 + 135, MAX_Y * 2 - 16 * 4 - 2, &deathrate);
 
+    print(110 + 135 + 50, MAX_Y * 2 - 16 * 1 - 2, "Infection duration (e): ");
+    dynamic_information_focus(110 + 135 + 50 + 170, MAX_Y * 2 - 16 * 1 - 2, &infection_duration);
+
 }
 
 bool propagation_random(float max, float proba)
@@ -601,27 +602,30 @@ bool propagation_random(float max, float proba)
     return ((rand() % (int)max) < (int)(proba * max));
 }
 
+# define HEALTH_STEP 2
+
 void update_health(BirdGroup &birds)
 {
     for (int i = 0; i < birds.nb; i++) {
         // IMMUNE: make it simple and keep immunity forever, in fact it's obv not the case
         // CLEAN: clean bird make nothing
-        // DEAD: dead bird can't revive
-        // INFECTED: infect others and die if no chance :(
+        // DEAD: dead bird can't revive, hard truth :/
+        // INFECTED: infect others and die if no chance
+        // All the probability are weighted by the disease time and update call to get as close as possible to the usual usage of r0 etc...
         if (birds.bird[i].health.state == INFECTED) {
-            if (propagation_random(100, deathrate.value / 20)) { // die if the life isn't nice
+            if (propagation_random(1000, deathrate.val / (infection_duration.val * HEALTH_STEP))) { // die if the life isn't nice
                 birds.bird[i].health.state = DEAD;
-                bird_infected.value -= 1;
-                bird_dead.value += 1;
-            } else if (birds.bird[i].health.infected_clock++ == 60) { // cure if the life is nice and become IMMUNE or CLEAN depend of the immunity weight
+                bird_infected.val -= 1;
+                bird_dead.val += 1;
+            } else if (birds.bird[i].health.infected_clock++ == (infection_duration.val * HEALTH_STEP)) { // cure if the life is nice and become IMMUNE or CLEAN depend of the immunity weight
                 birds.bird[i].health.infected_clock = 0;
-                bird_infected.value -= 1;
-                if (propagation_random(100, immunity_weight.value)) {
-                    bird_immune.value += 1;
+                bird_infected.val -= 1;
+                if (propagation_random(1000, immunity_weight.val)) {
+                    bird_immune.val += 1;
                     birds.bird[i].health.state = IMMUNE;
                     birds.bird[i].color = color_init(0, 255, 0, 255);
                 } else {
-                    bird_clean.value += 1;
+                    bird_clean.val += 1;
                     birds.bird[i].health.state = CLEAN;
                     birds.bird[i].color = color_init(255, 255, 255, 255);
                 }
@@ -629,9 +633,9 @@ void update_health(BirdGroup &birds)
                 for (int j = 0; j < birds.nb; j++) {
                     if (birds.bird[j].health.state == CLEAN && j != i) {
                         float dist = complex_get_distance_diff(birds.bird[i].pos, birds.bird[j].pos);
-                        if (dist < radius_propagation.value && propagation_random(100, propagation_probability.value / 5)) {
-                            bird_clean.value -= 1;
-                            bird_infected.value += 1;
+                        if (dist < radius_propagation.val && propagation_random(1000, propagation_probability.val / (infection_duration.val * HEALTH_STEP))) {
+                            bird_clean.val -= 1;
+                            bird_infected.val += 1;
                             birds.bird[j].health.state = INFECTED;
                             birds.bird[j].color = color_init(255, 0, 0, 255);
                         }
@@ -666,10 +670,12 @@ int main(void)
             bird_update(birds); // update the bird position
             bird_handle_world(birds); // handle world depending on given rules
             delay(10);
-            if ((int)SDL_GetTicks() / 400 > clock) { // ~ 2.5 times by second
+            if ((int)SDL_GetTicks() / (1000 / HEALTH_STEP) > clock) { // ~ 2 times by second
                 update_health(birds);
                 clock++;
             }
+        } else {
+            delay(50);
         }
         bird_draw(birds); // finally draw
         dynamic_health_information(); // display bird health information

@@ -1,6 +1,6 @@
 # Fouloscopia
 
-Fouloscopia is a little Boid-like implementation with run-time parametring.
+Fouloscopia is a little Boid-like implementation with runtime parametring. On top of that a disease propagation is implemented, with also, runtime parametring.
 
 The project is lead using the `GrAPiC` graphic library provided by [Alexandre Meyer](https://perso.liris.cnrs.fr/alexandre.meyer/grapic/html/index.html).
 
@@ -32,7 +32,7 @@ run it;
 
 > ./fouloscopia.bin
 
-clean the *all* the build:
+clean the the build:
 
 > make clean
 
@@ -40,13 +40,13 @@ clean the *all* the build:
 
 Runtime basic key trigger.
 
- Key     | Description                           
+ Key     | Description
 ---------|------------------------------------------
-`\SPACE` | Pause the bird update                     
-`\ENTRY` | Reset all the bird position to 0         
-`\ESC`   | Quit the program                        
-`\UP`    | Increase the focused quantity            
-`\DOWN`  | Decrease the focused quantity            
+`\SPACE` | Pause the bird update
+`\ENTRY` | Reset all the bird position to 0 (middle of the map)
+`\ESC`   | Quit the program
+`\UP`    | Increase the focused quantity
+`\DOWN`  | Decrease the focused quantity
 
 
 Runtime bird behavior.
@@ -56,26 +56,24 @@ Runtime bird behavior.
 `w`      | modify bird world interaction            | Geometric or randomback or infinite
 `g`      | modify grouping behavior                 | boolean
 `r`      | modify randoming behavior                | boolean
-`1`      | focuse the repulsion weight quantity     | float
-`2`      | focuse the alignement weight quantity    | float
-`3`      | focuse the cohesion weight quantity      | float
-`4`      | focuse the repulsion field quantity      | float
-`5`      | focuse the alignement field quantity     | float
-`6`      | focuse the cohesion field quantity       | float
-`7`      | focuse the velocity weight quantity      | float
-`8`      | focuse the acceleration weight quantity  | float
-`9`      | focuse the physical weight quantity      | float
+`1`      | focus the repulsion weight quantity      | float
+`2`      | focus the alignement weight quantity     | float
+`3`      | focus the cohesion weight quantity       | float
+`4`      | focus the repulsion field quantity       | float
+`5`      | focus the alignement field quantity      | float
+`6`      | focus the cohesion field quantity        | float
+`7`      | focus the velocity weight quantity       | float
+`8`      | focus the acceleration weight quantity   | float
+`9`      | focus the physical weight quantity       | float
 
 Runtime bird health.
 
  Key     | Description                                                      | Quantity Involved
 ---------|------------------------------------------------------------------|---------------------
-`a`      | focuse the r0 quantity between 0 and 1                           | float
-`b`      | focuse the radius quantity (minimal distance for propagation)    | float
-`c`      | focuse the immunity weight quantity between 0 and 1              | float
-`d`      | focuse the death rate quantity between 0 and 1                   | float
-
-
+`a`      | focus the r0 quantity                                            | float
+`b`      | focus the radius quantity (minimal distance for propagation)     | float
+`c`      | focus the immunity weight quantity between 0 and 1               | float
+`d`      | focus the death rate quantity between 0 and 1                    | float
 
 ## Sampling
 
