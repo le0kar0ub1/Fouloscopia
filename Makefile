@@ -1,10 +1,10 @@
 CXX		:=	g++
 
-target  := fouloscopia
+target  := src
 
-TARGET	:=	$(target).bin
+TARGET	:=	fouloscopia.bin
 
-BUILDIR	:=	target/$(target)
+BUILDIR	:=	target
 
 INCLUDE	:=	$(addprefix -I, $(target) mktoolchain/toolchain/include)
 

@@ -1,8 +1,8 @@
 # Fouloscopia
 
-Fouloscopia is a little Boid-like implementation with runtime parametring. On top of that a disease propagation is implemented, with also, runtime parametring.
+Fouloscopia is a little Boids-like implementation with runtime parametring. On top of that a disease propagation is implemented, with also, runtime parametring.
 
-The project is lead using the `GrAPiC` graphic library provided by [Alexandre Meyer](https://perso.liris.cnrs.fr/alexandre.meyer/grapic/html/index.html).
+The project is led using the `GrAPiC` graphic library provided by [Alexandre Meyer](https://perso.liris.cnrs.fr/alexandre.meyer/grapic/html/index.html).
 
 ## Dependencies
 
@@ -74,6 +74,7 @@ Runtime bird health.
 `b`      | focus the radius quantity (minimal distance for propagation)     | float
 `c`      | focus the immunity weight quantity between 0 and 1               | float
 `d`      | focus the death rate quantity between 0 and 1                    | float
+`e`      | focus the infection duration                                     | float
 
 ## Sampling
 
