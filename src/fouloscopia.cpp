@@ -5,10 +5,10 @@
 using namespace std;
 using namespace grapic;
 
-# define MAX_X 500 // window size / 2 (this is a complex grid, you know)
-# define MAX_Y 500 // window size / 2 (this is a complex grid, you know)
+# define MAX_X 1920 / 2 //500 // window size / 2 (this is a complex grid, you know)
+# define MAX_Y 1080 / 2 //500 // window size / 2 (this is a complex grid, you know)
 
-# define BIRD_BY_GROUP 300 // number of bird by group
+# define BIRD_BY_GROUP 500 // number of bird by group
 
 bool grouping = true; // if true, the birds try to group
 int  world = 0; // 0 == infinite | 1 == geometric | 2 == random back
@@ -28,14 +28,14 @@ Quantity alignement_field = {.val = 50, .mod = 1}; // field of action of the beh
 Quantity cohesion_field   = {.val = 20, .mod = 1}; // field of action of the behavior
 
 Quantity acceleration_weight = {.val = 1, .mod = 0.2};
-Quantity velocity_weight     = {.val = 3.5, .mod = 0.2};
+Quantity velocity_weight     = {.val = 6, .mod = 0.2};
 Quantity physical_weight     = {.val = 1.0, .mod = 0.2};
 
 Quantity repulsion_weight  = {.val = 10.0, .mod = 0.5};
 Quantity alignement_weight = {.val = 1.0, .mod = 0.5};
 Quantity cohesion_weight   = {.val = 0.2, .mod = 0.5};
 
-Quantity propagation_probability = {.val = 2, .mod = 0.2};
+Quantity propagation_probability = {.val = 2.5, .mod = 0.2};
 Quantity radius_propagation = {.val = 20, .mod = 1};
 Quantity immunity_weight = {.val = 0.90, .mod = 0.02};
 Quantity deathrate = {.val = 0.4, .mod = 0.02};
@@ -573,15 +573,29 @@ void dynamic_simulation_information(void)
 
 void dynamic_health_information(void)
 {
+    color(255, 255, 255, 255);
+    rectangleFill(0, MAX_Y * 2 - 16 - 2, 16, MAX_Y * 2 - 16 - 2 + 16);
     color(120, 144, 156, 255);
-    print(0, MAX_Y * 2 - 16 - 2, "Clean: ");
-    dynamic_information_focus(80, MAX_Y * 2 - 16 - 2, &bird_clean);
-    print(0, MAX_Y * 2 - 16 * 2 - 2, "Infected: ");
-    dynamic_information_focus(80, MAX_Y * 2 - 16 * 2 - 2, &bird_infected);
-    print(0, MAX_Y * 2 - 16 * 3 - 2, "Immune: ");
-    dynamic_information_focus(80, MAX_Y * 2 - 16 * 3 - 2, &bird_immune);
-    print(0, MAX_Y * 2 - 16 * 4 - 2, "Dead: ");
-    dynamic_information_focus(80, MAX_Y * 2 - 16 * 4 - 2, &bird_dead);
+    print(0 + 20, MAX_Y * 2 - 16 - 2, "Clean: ");
+    dynamic_information_focus(80 + 20, MAX_Y * 2 - 16 - 2, &bird_clean);
+
+    color(255, 0, 0, 255);
+    rectangleFill(0, MAX_Y * 2 - 16 * 2 - 2, 16, MAX_Y * 2 - 16 * 2 - 2 + 16);
+    color(120, 144, 156, 255);
+    print(0 + 20, MAX_Y * 2 - 16 * 2 - 2, "Infected: ");
+    dynamic_information_focus(80 + 20, MAX_Y * 2 - 16 * 2 - 2, &bird_infected);
+
+    color(0, 255, 0, 255);
+    rectangleFill(0, MAX_Y * 2 - 16 * 3 - 2, 16, MAX_Y * 2 - 16 * 3 - 2 + 16);
+    color(120, 144, 156, 255);
+    print(0 + 20, MAX_Y * 2 - 16 * 3 - 2, "Immune: ");
+    dynamic_information_focus(80 + 20, MAX_Y * 2 - 16 * 3 - 2, &bird_immune);
+
+    color(0, 0, 0, 0);
+    rectangleFill(0, MAX_Y * 2 - 16 * 4 - 2, 16, MAX_Y * 2 - 16 * 4 - 2 + 16);
+    color(120, 144, 156, 255);
+    print(0 + 20, MAX_Y * 2 - 16 * 4 - 2, "Dead: ");
+    dynamic_information_focus(80 + 20, MAX_Y * 2 - 16 * 4 - 2, &bird_dead);
 
     print(0 + 135, MAX_Y * 2 - 16 * 1 - 2, "R0 (a): ");
     dynamic_information_focus(110 + 135, MAX_Y * 2 - 16 * 1 - 2, &propagation_probability);
