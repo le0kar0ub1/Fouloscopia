@@ -1,9 +1,9 @@
 # include "Fouloscopia.hpp"
 
-Fouloscopia game;
+Fouloscopia simulation;
 
 int main(void)
 {
-    // game.run();
-    return (0);
+    simulation.run();
+    return (EXIT_SUCCESS);
 }

@@ -3,39 +3,39 @@
 
 Complex::Complex(Point p)
 {
-    this->_x = p.x;
-    this->_y = p.y;
+    _x = p.x;
+    _y = p.y;
 }
 
-Complex::Complex(double radius, double deg)
+Complex::Complex(float radius, float deg)
 {
-    this->_x = radius * (double)cos(deg / 180.0 * M_PI);
-    this->_y = radius * (double)sin(deg / 180.0 * M_PI);
+    _x = radius * (float)cos((double)(deg / 180.0 * M_PI));
+    _y = radius * (float)sin((double)(deg / 180.0 * M_PI));
 }
 
 Complex::~Complex() {}
 
-double Complex::x() const
+float Complex::x() const
 {
     return (_x);
 }
 
-double Complex::y() const
+float Complex::y() const
 {
     return (_y);
 }
 
-void Complex::set_x(double x)
+void Complex::set_x(float x)
 {
     _x = x;
 }
 
-void Complex::set_y(double y)
+void Complex::set_y(float y)
 {
     _y = y;
 }
 
-void Complex::set(double x, double y)
+void Complex::set(float x, float y)
 {
     _x = x;
     _y = y;
@@ -43,78 +43,86 @@ void Complex::set(double x, double y)
 
 Complex operator+(const Complex &a, const Complex &b)
 {
-    return Complex(
+    return Complex(Point(
         a.x() + b.x(),
         a.y() + b.y()
-    );
+    ));
 }
 
 Complex operator-(const Complex &a, const Complex &b)
 {
-    return Complex(
+    return Complex(Point(
         a.x() - b.x(),
         a.y() - b.y()
-    );
+    ));
 }
 
 Complex operator*(const Complex &a, const Complex &b)
 {
-    return Complex(
+    return Complex(Point(
         a.x() * b.x() - a.y() * b.y(),
         a.x() * b.y() + a.y() * b.x()
-    );
+    ));
 }
 
-Complex operator*(const Complex &a, double scalar)
+Complex operator*(const Complex &a, float scalar)
 {
-    return Complex(
+    return Complex(Point(
         a.x() * scalar,
         a.y() * scalar
-    );
+    ));
 }
 
-Complex operator/(const Complex &a, double scalar)
+Complex operator/(const Complex &a, float scalar)
 {
-    return Complex(
+    return Complex(Point(
         a.x() / scalar,
         a.y() / scalar
-    );
+    ));
 }
 
-double Complex::get_angle(void) const
+float Complex::get_angle(void) const
 {
     return (atan2(_x, -_y) * 180 / M_PI);
 }
 
-double Complex::get_radius(void) const
+float Complex::get_radius(void) const
 {
     return (sqrt(pow(_x, 2) + pow(_y, 2)));
 }
 
-double Complex::get_distance_diff(const Complex &b) const
+float Complex::get_distance_diff(const Complex &b) const
 {
     return (sqrt(pow(_x - b.x(), 2) + pow(_y - b.y(), 2)));
 }
 
-Complex Complex::stage(double stage)
+Complex Complex::stage(float stage)
 {
-    double cur = get_radius();
+    float rad = get_radius();
 
-    if (cur > stage) {
-        return (*this / cur);
+    if (rad > stage) {
+        return (*this / rad);
     }
     return (*this);
 }
 
 Complex Complex::normalize()
 {
-    double rad = get_radius();
+    float rad = get_radius();
 
     if (rad) {
-        return (Complex(
-            _x /rad,
-            _y /rad
+        return Complex(Point(
+            _x / rad,
+            _y / rad
         ));
     }
     return (*this);
+}
+
+void operator<<(std::ostream &off, const Complex &a)
+{
+    if (a.y() < 0)
+        off << a.x() << " " << a.y() << " i\n";
+    else 
+        off << a.x() << " + " << a.y() << " i\n";
 }

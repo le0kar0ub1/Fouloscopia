@@ -2,12 +2,13 @@
 # define __COMPLEX_HPP__
 
 # include <math.h>
+# include <iostream>
 
 struct Point
 {
-    double x;
-    double y;
-    Point(double x, double y): x(x), y(y) {}
+    float x;
+    float y;
+    Point(float sx, float sy) {x = sx; y = sy;}
 };
 
 class Complex
@@ -15,21 +16,28 @@ class Complex
 public:
     Complex(Point p);
     Complex(){};
-    Complex(double radius, double deg);
-    double get_angle(void) const;
-    double get_radius(void) const;
-    double get_distance_diff(const Complex &b) const;
-    Complex stage(double stage);
+    Complex(float radius, float deg);
+    float get_angle(void) const;
+    float get_radius(void) const;
+    float get_distance_diff(const Complex &b) const;
+    Complex stage(float stage);
     Complex normalize();
-    double x() const;
-    double y() const;
-    void set_x(double x);
-    void set_y(double y);
-    void set(double x, double y);
+    float x() const;
+    float y() const;
+    void set_x(float x);
+    void set_y(float y);
+    void set(float x, float y);
     ~Complex();
 private:
-    double _x;
-    double _y;
+    float _x;
+    float _y;
 };
+
+Complex operator+(const Complex &a, const Complex &b);
+Complex operator-(const Complex &a, const Complex &b);
+Complex operator*(const Complex &a, const Complex &b);
+Complex operator*(const Complex &a, float scalar);
+Complex operator/(const Complex &a, float scalar);
+void operator<<(std::ostream &off, const Complex &a);
 
 #endif /* __COMPLEX_HPP__ */

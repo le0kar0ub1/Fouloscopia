@@ -29,20 +29,21 @@ class Boid
 {
 public:
     Boid();
-    void Draw() const;
+    void draw() const;
     void handle_world();
     void random_life();
+    void set_pos(float x, float y);
     void update_pos();
     void update_health();
     ~Boid();
 private:
-    void handle_world_randomback();
-    void handle_world_geometric();
-    void handle_world_infinite();
-    void repulsion();
-    void alignement();
-    void cohesion();
-    double _deg;
+    void handle_world_randomback(void);
+    void handle_world_geometric(void);
+    void handle_world_infinite(void);
+    Complex repulsion(void);
+    Complex alignement(void);
+    Complex cohesion(void);
+    int _deg;
     Color _color;
     Complex _pos;
     Complex _velocity;
