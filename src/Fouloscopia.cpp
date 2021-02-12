@@ -23,7 +23,11 @@ void Fouloscopia::init()
     color(255, 255, 255, 255);
     fontSize(16);
     srand(time(NULL));
-    // birds.bird[rand() % BIRD_BY_GROUP].health.state = INFECTED; // infect a random one
+
+    auto boid = boids.begin();
+    std::advance(boid, rand() % BIRD_BY_GROUP);
+    boid->set_health(INFECTED);
+    boid->set_color(Color(255, 0, 0, 255));
 }
 
 void Fouloscopia::exit()
@@ -206,11 +210,16 @@ void Fouloscopia::dynamic_health_information(void)
 void Fouloscopia::run()
 {
     int clock = 0;
+    bool healthtrigger = true;
 
     init();
 
     while (!isKeyPressed(SDLK_ESCAPE)) {
         winClear();
+        // if ((int)SDL_GetTicks() / (1000 / HEALTH_STEP) > clock) { // ~ 2 times by second
+        //     healthtrigger = true;
+        //     clock++;
+        // }
         for (std::list<Boid>::iterator boid = this->boids.begin(); boid != this->boids.end(); boid++) {
             if (this->updating) {
                 if (this->randoming) {
@@ -218,9 +227,9 @@ void Fouloscopia::run()
                 }
                 boid->update_pos(); // update the bird position
                 boid->handle_world(); // handle world depending on given rules
-                if ((int)SDL_GetTicks() / (1000 / HEALTH_STEP) > clock) { // ~ 2 times by second
+                if (healthtrigger) {
                     boid->update_health();
-                    clock++;
+                    healthtrigger = false;
                 }
             }
             boid->draw(); // finally draw

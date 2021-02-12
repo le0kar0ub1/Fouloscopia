@@ -2,22 +2,11 @@
 # include "Fouloscopia.hpp"
 # include "Grapic.h"
 
-Color color_init(int r, int g, int b, int a)
-{
-    Color color = {
-        .r = r,
-        .g = g,
-        .b = b,
-        .a = a
-    };
-    return (color);
-}
-
 Boid::Boid()
 {
-    _pos = Complex(Point(0,0)); //rand() % 1000 - 500, rand() % 1000 - 500));
+    _pos = Complex(Point(0,0));
     _deg = rand() % 360;
-    _color = color_init(255, 255, 255, 255);
+    _color = Color(255, 255, 255, 255);
     _velocity = Complex(Point((rand() % 3 - 2), (rand() % 3 - 2)));
     _acc = Complex(Point(0, 0));
     _health.state = CLEAN;
@@ -220,8 +209,7 @@ Complex Boid::cohesion(void)
         cohesion = cohesion / (float)cohesion_count;
         cohesion = Complex(0, 0) - cohesion;
         cohesion = cohesion.normalize() * simulation.velocity_weight.val;
-        _acc = cohesion - _velocity;
-        _acc = _acc.stage(simulation.physical_weight.val);
+        _acc = (cohesion - _velocity).stage(simulation.physical_weight.val);
     }
     return (cohesion);
 }
@@ -247,8 +235,7 @@ void Boid::update_pos(void)
     
     _acc = _acc * simulation.acceleration_weight.val; // weight the acceleration
     if (simulation.grouping) {
-        _velocity = _velocity + _acc;
-        _velocity.stage(simulation.velocity_weight.val);
+        _velocity = (_velocity + _acc).stage(simulation.velocity_weight.val);
         _pos = _pos + _velocity * simulation.velocity_weight.val;
     } else {
         _velocity = Complex(simulation.velocity_weight.val, (float)_deg);
@@ -257,4 +244,60 @@ void Boid::update_pos(void)
     _acc = _acc * 0; // reset acc
 }
 
-void Boid::update_health() {}
+void Boid::set_health(enum BIRD_HEALTH_STATE state)
+{
+    _health.state = state;
+}
+
+void Boid::set_color(Color color)
+{
+    _color = color;
+}
+
+/**
+ * Built-in random to fight against low probability
+ */
+static bool propagation_random(float max, float proba)
+{
+    return ((rand() % (int)max) < (int)(proba * max));
+}
+
+void Boid::update_health()
+{
+    // IMMUNE: make it simple and keep immunity forever, in fact it's obv not the case
+    // CLEAN: clean bird make nothing
+    // DEAD: dead bird can't revive, hard truth :/
+    // INFECTED: infect others and die if no chance
+    // All the probability are weighted by the disease time and update call to get as close as possible to the usual usage of r0 etc...
+    if (_health.state == INFECTED) {
+        if (propagation_random(1000, simulation.deathrate.val / (simulation.infection_duration.val * HEALTH_STEP))) { // die if the life isn't nice
+            _health.state = DEAD;
+            simulation.bird_infected.val -= 1;
+            simulation.bird_dead.val += 1;
+        } else if (_health.infected_clock++ == (simulation.infection_duration.val * HEALTH_STEP)) { // cure if the life is nice and become IMMUNE or CLEAN depend of the immunity weight
+            _health.infected_clock = 0;
+            simulation.bird_infected.val -= 1;
+            if (propagation_random(1000, simulation.immunity_weight.val)) {
+                simulation.bird_immune.val += 1;
+                _health.state = IMMUNE;
+                _color = Color(0, 255, 0, 255);
+            } else {
+                simulation.bird_clean.val += 1;
+                _health.state = CLEAN;
+                _color = Color(255, 255, 255, 255);
+            }
+        } else { // infect other friends
+            for (std::list<Boid>::iterator boid = simulation.boids.begin(); boid != simulation.boids.end(); boid++) {
+                if (boid->_health.state == CLEAN) {
+                    float dist = _pos.get_distance_diff(boid->_pos);
+                    if (dist < simulation.radius_propagation.val) {// && propagation_random(1000, simulation.propagation_probability.val / (simulation.infection_duration.val * HEALTH_STEP))) {
+                        simulation.bird_clean.val -= 1;
+                        simulation.bird_infected.val += 1;
+                        boid->_health.state = INFECTED;
+                        boid->_color = Color(255, 0, 0, 255);
+                    }
+                }
+            }
+        }   
+    }
+}

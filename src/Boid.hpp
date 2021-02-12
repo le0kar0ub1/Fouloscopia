@@ -9,6 +9,8 @@ struct Color
     int g;
     int b;
     int a;
+    Color(int r, int g, int b, int a): r(r), g(g), b(b), a(a) {}
+    Color() {}
 };
 
 enum BIRD_HEALTH_STATE
@@ -35,6 +37,8 @@ public:
     void set_pos(float x, float y);
     void update_pos();
     void update_health();
+    void set_health(enum BIRD_HEALTH_STATE state);
+    void set_color(Color color);
     ~Boid();
 private:
     void handle_world_randomback(void);
