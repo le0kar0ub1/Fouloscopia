@@ -5,10 +5,10 @@
 using namespace std;
 using namespace grapic;
 
-# define MAX_X 1920 / 2 //500 // window size / 2 (this is a complex grid, you know)
-# define MAX_Y 1080 / 2 //500 // window size / 2 (this is a complex grid, you know)
+# define MAX_X 500 // window size / 2 (this is a complex grid, you know)
+# define MAX_Y 500 // window size / 2 (this is a complex grid, you know)
 
-# define BIRD_BY_GROUP 500 // number of bird by group
+# define BIRD_BY_GROUP 300 // number of bird by group
 
 bool grouping = true; // if true, the birds try to group
 int  world = 0; // 0 == infinite | 1 == geometric | 2 == random back
@@ -347,6 +347,9 @@ void bird_random_life(BirdGroup &birds)
     }
 }
 
+/**
+ * Handle repulsion rule behavior
+ */
 Complex bird_repulsion(BirdGroup &birds, int eval)
 {
     Complex repulsion = complex_init_cartesian(0, 0);
@@ -369,6 +372,9 @@ Complex bird_repulsion(BirdGroup &birds, int eval)
     return (repulsion);
 }
 
+/**
+ * Handle alignement rule behavior
+ */
 Complex bird_alignement(BirdGroup &birds, int eval)
 {
     Complex alignement = complex_init_cartesian(0, 0);
@@ -388,6 +394,9 @@ Complex bird_alignement(BirdGroup &birds, int eval)
     return (alignement);
 }
 
+/**
+ * Handle cohesion rule behavior
+ */
 Complex bird_cohesion(BirdGroup &birds, int eval)
 {
     Complex cohesion = complex_init_cartesian(0, 0);
@@ -412,28 +421,25 @@ Complex bird_cohesion(BirdGroup &birds, int eval)
 
 /**
  * The core of the simulation purpose
- *   - repulsion  (< 20) with others if they are rather near
- *   - alignement (< 50) with others if they are rather near
- *   - cohesion   (< 20) with others if they are rather far
  * All of the update isn't well defined, in fact it's a heap of scalar which we can modulate to obtain more or less a group
  * I (actually) don't think that the current parameters are the best one
  */
 void bird_update(BirdGroup &birds)
 {
     for (int i = 0; i < birds.nb; i++) {
-        Complex repulsion = bird_repulsion(birds, i);
-        Complex alignement = bird_alignement(birds, i);
-        Complex cohesion = bird_cohesion(birds, i);
+        Complex repulsion = bird_repulsion(birds, i); // compute the repulsion
+        Complex alignement = bird_alignement(birds, i); // compute the alignement
+        Complex cohesion = bird_cohesion(birds, i); // compute the cohesion
 
-        repulsion = repulsion * repulsion_weight.val;
-        alignement = alignement * alignement_weight.val;
-        cohesion  = cohesion * cohesion_weight.val; 
+        repulsion = repulsion * repulsion_weight.val; // weight the repulsion by the given qunatity
+        alignement = alignement * alignement_weight.val; // weight the alignement by the given qunatity
+        cohesion  = cohesion * cohesion_weight.val;  // weight the cohesion by the given qunatity
 
-        birds.bird[i].acc = birds.bird[i].acc + repulsion;
-        birds.bird[i].acc = birds.bird[i].acc + alignement;
-        birds.bird[i].acc = birds.bird[i].acc + cohesion;
+        birds.bird[i].acc = birds.bird[i].acc + repulsion; // add the repulsion vector to the acceleration
+        birds.bird[i].acc = birds.bird[i].acc + alignement; // add the alignement vector to the acceleration
+        birds.bird[i].acc = birds.bird[i].acc + cohesion; // add the cohesion vector to the acceleration
         
-        birds.bird[i].acc = birds.bird[i].acc * acceleration_weight.val;
+        birds.bird[i].acc = birds.bird[i].acc * acceleration_weight.val; // weight the acceleration
         if (grouping) {
             birds.bird[i].velocity = complex_stage(birds.bird[i].velocity + birds.bird[i].acc, velocity_weight.val);
             birds.bird[i].pos = birds.bird[i].pos + birds.bird[i].velocity * velocity_weight.val;
@@ -441,7 +447,7 @@ void bird_update(BirdGroup &birds)
             birds.bird[i].velocity = complex_init_polar(velocity_weight.val, birds.bird[i].deg);
             birds.bird[i].pos = birds.bird[i].pos + birds.bird[i].velocity;
         }
-        birds.bird[i].acc = birds.bird[i].acc * 0;
+        birds.bird[i].acc = birds.bird[i].acc * 0; // reset acc
     }
 }
 
@@ -506,6 +512,9 @@ void handle_input(BirdGroup &birds)
 
 }
 
+/**
+ * Print a quantity, particularly print it in red if focused
+ */
 void dynamic_information_focus(int x, int y, Quantity *cur)
 {
     char buf[10];
@@ -526,7 +535,7 @@ void dynamic_information_focus(int x, int y, Quantity *cur)
 }
 
 /**
- * Display dynamic informations
+ * Display dynamic informations about the birds behavior and the world
  */
 void dynamic_simulation_information(void)
 {
@@ -571,6 +580,9 @@ void dynamic_simulation_information(void)
 
 }
 
+/**
+ * Dysplay dynamic information about the bird health
+ */
 void dynamic_health_information(void)
 {
     color(255, 255, 255, 255);
@@ -611,6 +623,9 @@ void dynamic_health_information(void)
 
 }
 
+/**
+ * Built-in random to fight against low probability
+ */
 bool propagation_random(float max, float proba)
 {
     return ((rand() % (int)max) < (int)(proba * max));
@@ -618,6 +633,9 @@ bool propagation_random(float max, float proba)
 
 # define HEALTH_STEP 2
 
+/**
+ *  Update boid health
+ */
 void update_health(BirdGroup &birds)
 {
     for (int i = 0; i < birds.nb; i++) {
