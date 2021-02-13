@@ -4,10 +4,11 @@
 
 Boid::Boid()
 {
-    _pos = Complex(Point(0,0));
+    // _pos = Complex(Point(rand() % 900 - 400, rand() % 900 - 400));
+    _pos = Complex(Point(0, 0));
     _deg = rand() % 360;
     _color = Color(255, 255, 255, 255);
-    _velocity = Complex(Point((rand() % 3 - 2), (rand() % 3 - 2)));
+    _velocity = Complex(Point(rand() % 2 - 1, rand() % 2 - 1));
     _acc = Complex(Point(0, 0));
     _health.state = CLEAN;
     _health.infected_clock = 0;
@@ -15,9 +16,24 @@ Boid::Boid()
 
 Boid::~Boid() {}
 
+Complex Boid::pos(void) const
+{
+    return (_pos);
+}
+
 void Boid::set_pos(float x, float y)
 {
     _pos.set(x, y);
+}
+
+void Boid::set_health(enum BOID_HEALTH_STATE state)
+{
+    _health.state = state;
+}
+
+void Boid::set_color(Color color)
+{
+    _color = color;
 }
 
 void Boid::draw() const
@@ -31,9 +47,9 @@ void Boid::draw() const
     } else {
         deg = (_deg + 180) % 360;
     }
-    Complex p2(simulation.bird_size.val, (deg - (int)simulation.bird_size.val * 2) % 360);
+    Complex p2(simulation.boid_size.val, (deg - (int)simulation.boid_size.val * 2) % 360);
     p2 = p2 + _pos;
-    Complex p3(simulation.bird_size.val, (deg + (int)simulation.bird_size.val * 2) % 360);
+    Complex p3(simulation.boid_size.val, (deg + (int)simulation.boid_size.val * 2) % 360);
     p3 = p3 + _pos;
     color(_color.r, _color.g, _color.b, _color.a);
     triangleFill(
@@ -44,24 +60,24 @@ void Boid::draw() const
 }
 
 /**
- * If bird touch the wall then make him turn over 180° randomly +/- 45°
+ * If boid touch the wall then make him turn over 180° randomly +/- 45°
  */
 void Boid::handle_world_randomback(void)
 {
     int randomed = (rand() % 90) - 45;
-    if (_pos.x() < (-MAX_X + simulation.bird_size.val)) {
+    if (_pos.x() < (-MAX_X + simulation.boid_size.val)) {
         if ((_deg >= 90 && _deg <= 180) || (_deg >= 180 && _deg <= 270)) {
             _deg = ((_deg + 180 + randomed) % 360);
         }
-    } else if (_pos.y() > (MAX_Y - simulation.bird_size.val))  {
+    } else if (_pos.y() > (MAX_Y - simulation.boid_size.val))  {
         if ((_deg >= 90 && _deg <= 180) || (_deg > 0 && _deg < 90)) {
             _deg = ((_deg + 180 + randomed) % 360);
         }
-    } else if (_pos.y() < (-MAX_Y + simulation.bird_size.val)) {
+    } else if (_pos.y() < (-MAX_Y + simulation.boid_size.val)) {
         if ((_deg >= 180 && _deg <= 270) || (_deg >= 270 && _deg <= 360)) {
             _deg = ((_deg + 180 + randomed) % 360);
         }
-    } else if (_pos.x() > (MAX_X - simulation.bird_size.val)) {
+    } else if (_pos.x() > (MAX_X - simulation.boid_size.val)) {
         if ((_deg >= 0 && _deg <= 90) || (_deg >= 270 && _deg <= 360)) {
             _deg = ((_deg + 180 + randomed) % 360);
         }
@@ -69,29 +85,29 @@ void Boid::handle_world_randomback(void)
 }
 
 /**
- * If bird touch the wall then make him turn over 90° in natural direction
+ * If boid touch the wall then make him turn over 90° in natural direction
  */
 void Boid::handle_world_geometric(void)
 {
-    if (_pos.x() < (-MAX_X + simulation.bird_size.val)) {
+    if (_pos.x() < (-MAX_X + simulation.boid_size.val)) {
         if (_deg >= 90 && _deg <= 180) {
             _deg = (_deg - 90) % 360;
         } else if (_deg >= 180 && _deg <= 270) {
             _deg = (_deg + 90) % 360;
         }
-    } else if (_pos.y() > (MAX_Y - simulation.bird_size.val))  {
+    } else if (_pos.y() > (MAX_Y - simulation.boid_size.val))  {
         if (_deg >= 90 && _deg <= 180) {
             _deg = (_deg + 90) % 360;
         } else if (_deg > 0 && _deg < 90) {
             _deg = 360 + (_deg - 90);
         }
-    } else if (_pos.y() < (-MAX_Y + simulation.bird_size.val)) {
+    } else if (_pos.y() < (-MAX_Y + simulation.boid_size.val)) {
         if (_deg >= 180 && _deg <= 270) {
             _deg = (_deg - 90) % 360;
         } else if (_deg >= 270 && _deg <= 360) {
             _deg = (_deg + 90) % 360;
         }
-    } else if (_pos.x() > (MAX_X - simulation.bird_size.val)) {
+    } else if (_pos.x() > (MAX_X - simulation.boid_size.val)) {
         if (_deg >= 0 && _deg <= 90) {
             _deg = (_deg + 90) % 360;
         } else if (_deg >= 270 && _deg <= 360) {
@@ -107,11 +123,11 @@ void Boid::handle_world_infinite(void)
 {
     if (_pos.x() < -MAX_X)
         _pos.set_x(_pos.x() + MAX_X * 2);
-    if (_pos.x() > MAX_X)
+    else if (_pos.x() > MAX_X)
         _pos.set_x(_pos.x() - MAX_X * 2);
     if (_pos.y() < -MAX_Y)
         _pos.set_y(_pos.y() + MAX_Y * 2);
-    if (_pos.y() > MAX_Y)
+    else if (_pos.y() > MAX_Y)
         _pos.set_y(_pos.y() - MAX_Y * 2);
 }
 
@@ -130,11 +146,12 @@ void Boid::handle_world(void)
 }
 
 /**
- * Randomly move the bird orientation +/- 10°
+ * Randomly move the boid orientation +/- 10°
  */
 void Boid::random_life(void)
 {
     int randomed = rand() % 180;
+
     if (randomed <= 20) {
         _deg = (_deg + (randomed - 10)) % 360;
         if (_deg < 0) {
@@ -151,7 +168,7 @@ Complex Boid::repulsion(void)
     Complex repulsion(Point(0, 0));
     int repulsion_count;
 
-    for (std::list<Boid>::iterator boid = simulation.boids.begin(); boid != simulation.boids.end(); boid++) {
+    for (auto boid = simulation.boids.begin(); boid != simulation.boids.end(); boid++) {
         float dist = _pos.get_distance_diff(boid->_pos);
         if (dist > 0 && dist < simulation.repulsion_field.val) {
             repulsion = repulsion + ((_pos - boid->_pos).normalize() / dist);
@@ -169,25 +186,25 @@ Complex Boid::repulsion(void)
 }
 
 /**
- * Handle alignement rule behavior
+ * Handle alignment rule behavior
  */
-Complex Boid::alignement(void)
+Complex Boid::alignment(void)
 {
-    Complex alignement(Point(0, 0));
-    int alignement_count;
+    Complex alignment(Point(0, 0));
+    int alignment_count;
 
-    for (std::list<Boid>::iterator boid = simulation.boids.begin(); boid != simulation.boids.end(); boid++) {
+    for (auto boid = simulation.boids.begin(); boid != simulation.boids.end(); boid++) {
         float dist = _pos.get_distance_diff(boid->_pos);
-        if (dist > 0 && dist < simulation.alignement_field.val) {
-            alignement = alignement + boid->_velocity;
-            alignement_count++;
+        if (dist > 0 && dist < simulation.alignment_field.val) {
+            alignment = alignment + boid->_velocity;
+            alignment_count++;
         }
     }
-    if (alignement_count > 0) {
-        alignement = (alignement / (float)alignement_count).normalize() * simulation.velocity_weight.val;
-        alignement = (alignement - _velocity).stage(simulation.physical_weight.val);
+    if (alignment_count > 0) {
+        alignment = (alignment / (float)alignment_count).normalize() * simulation.velocity_weight.val;
+        alignment = (alignment - _velocity).stage(simulation.physical_weight.val);
     }
-    return (alignement);
+    return (alignment);
 }
 
 /**
@@ -198,7 +215,7 @@ Complex Boid::cohesion(void)
     Complex cohesion(Point(0, 0));
     int cohesion_count;
 
-    for (std::list<Boid>::iterator boid = simulation.boids.begin(); boid != simulation.boids.end(); boid++){;
+    for (auto boid = simulation.boids.begin(); boid != simulation.boids.end(); boid++){;
         float dist = _pos.get_distance_diff(boid->_pos);
         if (dist > 0 && dist < simulation.cohesion_field.val) {;
             cohesion = cohesion + boid->_pos;
@@ -222,18 +239,19 @@ Complex Boid::cohesion(void)
 void Boid::update_pos(void)
 {
     Complex repulsion = this->repulsion(); // compute the repulsion
-    Complex alignement = this->alignement(); // compute the alignement
+    Complex alignment = this->alignment(); // compute the alignment
     Complex cohesion = this->cohesion(); // compute the cohesion
 
     repulsion = repulsion * simulation.repulsion_weight.val; // weight the repulsion by the given qunatity
-    alignement = alignement * simulation.alignement_weight.val; // weight the alignement by the given qunatity
+    alignment = alignment * simulation.alignment_weight.val; // weight the alignment by the given qunatity
     cohesion  = cohesion * simulation.cohesion_weight.val;  // weight the cohesion by the given qunatity
 
     _acc = _acc + repulsion; // add the repulsion vector to the acceleration
-    _acc = _acc + alignement; // add the alignement vector to the acceleration
+    _acc = _acc + alignment; // add the alignment vector to the acceleration
     _acc = _acc + cohesion; // add the cohesion vector to the acceleration
     
     _acc = _acc * simulation.acceleration_weight.val; // weight the acceleration
+
     if (simulation.grouping) {
         _velocity = (_velocity + _acc).stage(simulation.velocity_weight.val);
         _pos = _pos + _velocity * simulation.velocity_weight.val;
@@ -244,60 +262,50 @@ void Boid::update_pos(void)
     _acc = _acc * 0; // reset acc
 }
 
-void Boid::set_health(enum BIRD_HEALTH_STATE state)
-{
-    _health.state = state;
-}
-
-void Boid::set_color(Color color)
-{
-    _color = color;
-}
-
 /**
  * Built-in random to fight against low probability
  */
-static bool propagation_random(float max, float proba)
+static bool propagation_random(int max, float proba)
 {
-    return ((rand() % (int)max) < (int)(proba * max));
+    return ((rand() % max) < (int)(proba * max));
 }
 
 void Boid::update_health()
 {
     // IMMUNE: make it simple and keep immunity forever, in fact it's obv not the case
-    // CLEAN: clean bird make nothing
-    // DEAD: dead bird can't revive, hard truth :/
-    // INFECTED: infect others and die if no chance
-    // All the probability are weighted by the disease time and update call to get as close as possible to the usual usage of r0 etc...
+    // CLEAN: clean boid make nothing
+    // DEAD: dead boid can't revive, hard truth :/
+    // INFECTED: infect others, become immune or come back to clean, and die if no chance
+    // All the probabilities are weighted by the disease time and update call to get as close as possible to the usual usage of r0 etc...
     if (_health.state == INFECTED) {
         if (propagation_random(1000, simulation.deathrate.val / (simulation.infection_duration.val * HEALTH_STEP))) { // die if the life isn't nice
             _health.state = DEAD;
-            simulation.bird_infected.val -= 1;
-            simulation.bird_dead.val += 1;
+            simulation.boid_infected.val -= 1;
+            simulation.boid_dead.val += 1;
         } else if (_health.infected_clock++ == (simulation.infection_duration.val * HEALTH_STEP)) { // cure if the life is nice and become IMMUNE or CLEAN depend of the immunity weight
             _health.infected_clock = 0;
-            simulation.bird_infected.val -= 1;
+            simulation.boid_infected.val -= 1;
             if (propagation_random(1000, simulation.immunity_weight.val)) {
-                simulation.bird_immune.val += 1;
+                simulation.boid_immune.val += 1;
                 _health.state = IMMUNE;
                 _color = Color(0, 255, 0, 255);
             } else {
-                simulation.bird_clean.val += 1;
+                simulation.boid_clean.val += 1;
                 _health.state = CLEAN;
                 _color = Color(255, 255, 255, 255);
             }
         } else { // infect other friends
-            for (std::list<Boid>::iterator boid = simulation.boids.begin(); boid != simulation.boids.end(); boid++) {
+            for (auto boid = simulation.boids.begin(); boid != simulation.boids.end(); boid++) {
                 if (boid->_health.state == CLEAN) {
                     float dist = _pos.get_distance_diff(boid->_pos);
-                    if (dist < simulation.radius_propagation.val) {// && propagation_random(1000, simulation.propagation_probability.val / (simulation.infection_duration.val * HEALTH_STEP))) {
-                        simulation.bird_clean.val -= 1;
-                        simulation.bird_infected.val += 1;
+                    if (dist < simulation.radius_propagation.val && propagation_random(1000, simulation.propagation_probability.val / (simulation.infection_duration.val * HEALTH_STEP))) {
+                        simulation.boid_clean.val -= 1;
+                        simulation.boid_infected.val += 1;
                         boid->_health.state = INFECTED;
                         boid->_color = Color(255, 0, 0, 255);
                     }
                 }
             }
-        }   
+        }
     }
 }

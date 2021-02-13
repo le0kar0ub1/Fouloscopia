@@ -24,10 +24,12 @@ void Fouloscopia::init()
     fontSize(16);
     srand(time(NULL));
 
-    auto boid = boids.begin();
-    std::advance(boid, rand() % BIRD_BY_GROUP);
-    boid->set_health(INFECTED);
-    boid->set_color(Color(255, 0, 0, 255));
+    // auto boid = this->boids.begin();
+    // std::advance(boid, rand() % BIRD_BY_GROUP);
+    // boid->set_health(INFECTED);
+    // boid->set_color(Color(255, 0, 0, 255));
+    // boid_infected.val += 1;
+    // boid_clean.val -= 1;
 }
 
 void Fouloscopia::exit()
@@ -41,10 +43,8 @@ void Fouloscopia::exit()
 void Fouloscopia::handle_input()
 {
     if (isKeyPressed(SDLK_RETURN))
-        for (std::list<Boid>::iterator boid = this->boids.begin(); boid != this->boids.end(); boid++) {
+        for (auto boid = this->boids.begin(); boid != this->boids.end(); boid++)
             boid->set_pos(0, 0);
-            boid->set_pos(0, 0);
-        }
     if (isKeyPressed(SDLK_SPACE))
         updating = !updating;
 
@@ -72,13 +72,13 @@ void Fouloscopia::handle_input()
     if (isKeyPressed(SDLK_3))
         focus = &cohesion_weight;
     if (isKeyPressed(SDLK_2))
-        focus = &alignement_weight;
+        focus = &alignment_weight;
     if (isKeyPressed(SDLK_1))
         focus = &repulsion_weight;
     if (isKeyPressed(SDLK_6))
         focus = &cohesion_field;
     if (isKeyPressed(SDLK_5))
-        focus = &alignement_field;
+        focus = &alignment_field;
     if (isKeyPressed(SDLK_4))
         focus = &repulsion_field;
     if (isKeyPressed(SDLK_9))
@@ -91,7 +91,7 @@ void Fouloscopia::handle_input()
     if (isKeyPressed(SDLK_UP))
         focus->val += focus->mod;
     if (isKeyPressed(SDLK_DOWN))
-        if (focus->val > focus->mod)
+        if (focus->val >= focus->mod)
             focus->val -= focus->mod;
 
 }
@@ -119,7 +119,7 @@ void Fouloscopia::dynamic_information_focus(int x, int y, Quantity *cur)
 }
 
 /**
- * Display dynamic informations about the birds behavior and the world
+ * Display dynamic informations about the boids behavior and the world
  */
 void Fouloscopia::dynamic_simulation_information(void)
 {
@@ -145,14 +145,14 @@ void Fouloscopia::dynamic_simulation_information(void)
     color(120, 144, 156, 255);
     print(190, 0,  "cohesion weight (3):");
     dynamic_information_focus(190 + 165, 0, &cohesion_weight);
-    print(190, 16, "alignement weight (2):");
-    dynamic_information_focus(190 + 165, 16, &alignement_weight);
+    print(190, 16, "alignment weight (2):");
+    dynamic_information_focus(190 + 165, 16, &alignment_weight);
     print(190, 16 * 2, "repulsion weight (1):");
     dynamic_information_focus(190 + 165, 16 * 2, &repulsion_weight);
     print(400, 0, "cohesion field (6):");
     dynamic_information_focus(350 + 200, 0, &cohesion_field);
-    print(400, 16, "alignement field (5):");
-    dynamic_information_focus(350 + 200, 16, &alignement_field);
+    print(400, 16, "alignment field (5):");
+    dynamic_information_focus(350 + 200, 16, &alignment_field);
     print(400, 16 * 2, "repulsion field (4):");
     dynamic_information_focus(350 + 200, 16 * 2, &repulsion_field);
     print(600, 0, "physical weight (9):");
@@ -165,7 +165,7 @@ void Fouloscopia::dynamic_simulation_information(void)
 }
 
 /**
- * Dysplay dynamic information about the bird health
+ * Dysplay dynamic information about the boid health
  */
 void Fouloscopia::dynamic_health_information(void)
 {
@@ -173,25 +173,25 @@ void Fouloscopia::dynamic_health_information(void)
     rectangleFill(0, MAX_Y * 2 - 16 - 2, 16, MAX_Y * 2 - 16 - 2 + 16);
     color(120, 144, 156, 255);
     print(0 + 20, MAX_Y * 2 - 16 - 2, "Clean: ");
-    dynamic_information_focus(80 + 20, MAX_Y * 2 - 16 - 2, &bird_clean);
+    dynamic_information_focus(80 + 20, MAX_Y * 2 - 16 - 2, &boid_clean);
 
     color(255, 0, 0, 255);
     rectangleFill(0, MAX_Y * 2 - 16 * 2 - 2, 16, MAX_Y * 2 - 16 * 2 - 2 + 16);
     color(120, 144, 156, 255);
     print(0 + 20, MAX_Y * 2 - 16 * 2 - 2, "Infected: ");
-    dynamic_information_focus(80 + 20, MAX_Y * 2 - 16 * 2 - 2, &bird_infected);
+    dynamic_information_focus(80 + 20, MAX_Y * 2 - 16 * 2 - 2, &boid_infected);
 
     color(0, 255, 0, 255);
     rectangleFill(0, MAX_Y * 2 - 16 * 3 - 2, 16, MAX_Y * 2 - 16 * 3 - 2 + 16);
     color(120, 144, 156, 255);
     print(0 + 20, MAX_Y * 2 - 16 * 3 - 2, "Immune: ");
-    dynamic_information_focus(80 + 20, MAX_Y * 2 - 16 * 3 - 2, &bird_immune);
+    dynamic_information_focus(80 + 20, MAX_Y * 2 - 16 * 3 - 2, &boid_immune);
 
     color(0, 0, 0, 0);
     rectangleFill(0, MAX_Y * 2 - 16 * 4 - 2, 16, MAX_Y * 2 - 16 * 4 - 2 + 16);
     color(120, 144, 156, 255);
     print(0 + 20, MAX_Y * 2 - 16 * 4 - 2, "Dead: ");
-    dynamic_information_focus(80 + 20, MAX_Y * 2 - 16 * 4 - 2, &bird_dead);
+    dynamic_information_focus(80 + 20, MAX_Y * 2 - 16 * 4 - 2, &boid_dead);
 
     print(0 + 135, MAX_Y * 2 - 16 * 1 - 2, "R0 (a): ");
     dynamic_information_focus(110 + 135, MAX_Y * 2 - 16 * 1 - 2, &propagation_probability);
@@ -204,41 +204,42 @@ void Fouloscopia::dynamic_health_information(void)
 
     print(110 + 135 + 50, MAX_Y * 2 - 16 * 1 - 2, "Infection duration (e): ");
     dynamic_information_focus(110 + 135 + 50 + 170, MAX_Y * 2 - 16 * 1 - 2, &infection_duration);
-
 }
 
 void Fouloscopia::run()
 {
     int clock = 0;
-    bool healthtrigger = true;
+    bool healthtrigger = false;
 
     init();
 
     while (!isKeyPressed(SDLK_ESCAPE)) {
         winClear();
-        // if ((int)SDL_GetTicks() / (1000 / HEALTH_STEP) > clock) { // ~ 2 times by second
-        //     healthtrigger = true;
-        //     clock++;
-        // }
-        for (std::list<Boid>::iterator boid = this->boids.begin(); boid != this->boids.end(); boid++) {
-            if (this->updating) {
-                if (this->randoming) {
+        if ((int)SDL_GetTicks() / (1000 / HEALTH_STEP) > clock) { // ~ 2 times by second
+            healthtrigger = true;
+            clock++;
+        }
+        for (auto boid = this->boids.begin(); boid != this->boids.end(); boid++) {
+            if (updating) {
+                if (randoming) {
                     boid->random_life(); // the life being unpredictable, put a little bit of random
                 }
-                boid->update_pos(); // update the bird position
+                boid->update_pos(); // update the boid position
                 boid->handle_world(); // handle world depending on given rules
                 if (healthtrigger) {
                     boid->update_health();
-                    healthtrigger = false;
                 }
             }
-            boid->draw(); // finally draw
+            std::cout << boid->pos();
         }
-        delay(10);
-        dynamic_health_information(); // display bird health information
+        if (healthtrigger) {
+            healthtrigger = false;
+        }
+        dynamic_health_information(); // display boid health information
         dynamic_simulation_information(); // display the dynamic information for the user
-        handle_input(); // handle user inputs
         winDisplay();
+        handle_input(); // handle user inputs
+        delay(10);
     }
 
     exit();

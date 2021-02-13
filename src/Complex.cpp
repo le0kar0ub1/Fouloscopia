@@ -9,8 +9,8 @@ Complex::Complex(Point p)
 
 Complex::Complex(float radius, float deg)
 {
-    _x = radius * (float)cos((double)(deg / 180.0 * M_PI));
-    _y = radius * (float)sin((double)(deg / 180.0 * M_PI));
+    _x = radius * (float)cos(deg / 180.0 * M_PI);
+    _y = radius * (float)sin(deg / 180.0 * M_PI);
 }
 
 Complex::~Complex() {}
@@ -83,20 +83,20 @@ Complex operator/(const Complex &a, float scalar)
 
 float Complex::get_angle(void) const
 {
-    return (atan2(_x, -_y) * 180 / M_PI);
+    return ((float)atan2(_x, -_y) * 180 / M_PI);
 }
 
 float Complex::get_radius(void) const
 {
-    return (sqrt(pow(_x, 2) + pow(_y, 2)));
+    return ((float)sqrt(pow(_x, 2) + pow(_y, 2)));
 }
 
 float Complex::get_distance_diff(const Complex &b) const
 {
-    return (sqrt(pow(_x - b.x(), 2) + pow(_y - b.y(), 2)));
+    return ((float)sqrt(pow(_x - b.x(), 2) + pow(_y - b.y(), 2)));
 }
 
-Complex Complex::stage(float stage)
+Complex Complex::stage(float stage) const
 {
     float rad = get_radius();
 
@@ -106,15 +106,12 @@ Complex Complex::stage(float stage)
     return (*this);
 }
 
-Complex Complex::normalize()
+Complex Complex::normalize() const
 {
     float rad = get_radius();
 
     if (rad) {
-        return Complex(Point(
-            _x / rad,
-            _y / rad
-        ));
+        return (*this / rad);
     }
     return (*this);
 }

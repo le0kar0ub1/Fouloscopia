@@ -13,7 +13,7 @@ struct Color
     Color() {}
 };
 
-enum BIRD_HEALTH_STATE
+enum BOID_HEALTH_STATE
 {
     CLEAN = 0,
     INFECTED = 1,
@@ -23,7 +23,7 @@ enum BIRD_HEALTH_STATE
 
 struct Health
 {
-    enum BIRD_HEALTH_STATE state;
+    enum BOID_HEALTH_STATE state;
     int infected_clock;
 };
 
@@ -35,9 +35,10 @@ public:
     void handle_world();
     void random_life();
     void set_pos(float x, float y);
+    Complex pos(void) const;
     void update_pos();
     void update_health();
-    void set_health(enum BIRD_HEALTH_STATE state);
+    void set_health(enum BOID_HEALTH_STATE state);
     void set_color(Color color);
     ~Boid();
 private:
@@ -45,7 +46,7 @@ private:
     void handle_world_geometric(void);
     void handle_world_infinite(void);
     Complex repulsion(void);
-    Complex alignement(void);
+    Complex alignment(void);
     Complex cohesion(void);
     int _deg;
     Color _color;

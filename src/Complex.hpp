@@ -8,20 +8,20 @@ struct Point
 {
     float x;
     float y;
-    Point(float sx, float sy) {x = sx; y = sy;}
+    Point(float x, float y): x(x), y(y) {}
 };
 
 class Complex
 {
 public:
     Complex(Point p);
-    Complex(){};
+    Complex(): _x(0), _y(0) {};
     Complex(float radius, float deg);
     float get_angle(void) const;
     float get_radius(void) const;
     float get_distance_diff(const Complex &b) const;
-    Complex stage(float stage);
-    Complex normalize();
+    Complex stage(float stage) const;
+    Complex normalize() const;
     float x() const;
     float y() const;
     void set_x(float x);

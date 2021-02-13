@@ -44,31 +44,31 @@ Runtime basic key trigger.
 
  Key     | Description
 ---------|------------------------------------------
-`\SPACE` | Pause the bird update
-`\ENTRY` | Reset all the bird position to 0 (middle of the map)
+`\SPACE` | Pause the boid update
+`\ENTRY` | Reset all the boid position to 0 (middle of the map)
 `\ESC`   | Quit the program
 `\UP`    | Increase the focused quantity
 `\DOWN`  | Decrease the focused quantity
 
 
-Runtime bird behavior.
+Runtime boid behavior.
 
  Key     | Description                              | Quantity Involved
 ---------|------------------------------------------|---------------------
-`w`      | modify bird world interaction            | Geometric or randomback or infinite
+`w`      | modify boid world interaction            | Geometric or randomback or infinite
 `g`      | modify grouping behavior                 | boolean
 `r`      | modify randoming behavior                | boolean
 `1`      | focus the repulsion weight quantity      | float
-`2`      | focus the alignement weight quantity     | float
+`2`      | focus the alignment weight quantity      | float
 `3`      | focus the cohesion weight quantity       | float
 `4`      | focus the repulsion field quantity       | float
-`5`      | focus the alignement field quantity      | float
+`5`      | focus the alignment field quantity       | float
 `6`      | focus the cohesion field quantity        | float
 `7`      | focus the velocity weight quantity       | float
 `8`      | focus the acceleration weight quantity   | float
 `9`      | focus the physical weight quantity       | float
 
-Runtime bird health.
+Runtime boid health.
 
  Key     | Description                                                      | Quantity Involved
 ---------|------------------------------------------------------------------|---------------------

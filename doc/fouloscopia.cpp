@@ -1,7 +1,6 @@
+# include <Grapic.h>
 # include <iostream>
 # include <string>
-# include "Grapic.h"
-# include "Complex.hpp"
 
 using namespace std;
 using namespace grapic;
@@ -25,7 +24,7 @@ struct Quantity // value which user can modulate
 Quantity bird_size = {.val = 10, .mod = 1}; // size of one bird
 
 Quantity repulsion_field  = {.val = 20, .mod = 1}; // field of action of the behavior
-Quantity alignement_field = {.val = 50, .mod = 1}; // field of action of the behavior
+Quantity alignment_field = {.val = 50, .mod = 1}; // field of action of the behavior
 Quantity cohesion_field   = {.val = 20, .mod = 1}; // field of action of the behavior
 
 Quantity acceleration_weight = {.val = 1, .mod = 0.2};
@@ -33,7 +32,7 @@ Quantity velocity_weight     = {.val = 6, .mod = 0.2};
 Quantity physical_weight     = {.val = 1.0, .mod = 0.2};
 
 Quantity repulsion_weight  = {.val = 10.0, .mod = 0.5};
-Quantity alignement_weight = {.val = 1.0, .mod = 0.5};
+Quantity alignment_weight = {.val = 1.0, .mod = 0.5};
 Quantity cohesion_weight   = {.val = 0.2, .mod = 0.5};
 
 Quantity propagation_probability = {.val = 2.5, .mod = 0.2};
@@ -66,6 +65,105 @@ Color color_init(int r, int g, int b, int a)
         .a = a
     };
     return (color);
+}
+
+struct Complex
+{
+    float x;
+    float y;
+};
+
+Complex operator+(Complex a, Complex b)
+{
+    a.x += b.x;
+    a.y += b.y;
+    return (a);
+}
+
+Complex operator-(Complex a, Complex b)
+{
+    a.x -= b.x;
+    a.y -= b.y;
+    return (a);
+}
+
+Complex operator*(Complex a, Complex b)
+{
+    Complex ret = {
+        .x = a.x * b.x - a.y * b.y,
+        .y = a.x * b.y + a.y * b.x
+    };
+    return (ret);
+}
+
+Complex operator*(Complex a, float scalar)
+{
+    a.x = a.x * scalar;
+    a.y = a.y * scalar;
+    return (a);
+}
+
+Complex operator/(Complex a, float scalar)
+{
+    Complex ret = {
+        .x = a.x / scalar,
+        .y = a.y / scalar
+    };
+    return (ret);
+}
+
+Complex complex_init_cartesian(float x, float y)
+{
+    Complex ini = {
+        .x = x,
+        .y = y
+    };
+    return (ini);
+}
+
+Complex complex_init_polar(float radius, float deg)
+{
+    Complex ini = {
+        .x = radius * (float)cos(deg / 180.0 * M_PI),
+        .y = radius * (float)sin(deg / 180.0 * M_PI)
+    };
+    return (ini);
+}
+
+float complex_get_angle(Complex a)
+{
+    return ((float)atan2(a.x, -a.y) * 180 / M_PI);
+}
+
+float complex_get_radius(Complex a)
+{
+    return ((float)sqrt(pow(a.x, 2) + pow(a.y, 2)));
+}
+
+float complex_get_distance_diff(Complex a, Complex b)
+{
+    return ((float)sqrt(pow(a.x - b.x, 2) + pow(a.y - b.y, 2)));
+}
+
+Complex complex_stage(Complex a, float stage)
+{
+    float cur = complex_get_radius(a);
+
+    if (cur > stage) {
+        return (a / cur);
+    }
+    return (a);
+}
+
+Complex complex_normalize(Complex a)
+{
+    float rad = complex_get_radius(a);
+
+    if (rad) {
+        a.x = a.x / rad;
+        a.y = a.y / rad;
+    }
+    return (a);
 }
 
 enum BIRD_HEALTH_STATE
@@ -275,25 +373,25 @@ Complex bird_repulsion(BirdGroup &birds, int eval)
 }
 
 /**
- * Handle alignement rule behavior
+ * Handle alignment rule behavior
  */
-Complex bird_alignement(BirdGroup &birds, int eval)
+Complex bird_alignment(BirdGroup &birds, int eval)
 {
-    Complex alignement = complex_init_cartesian(0, 0);
-    int alignement_count;
+    Complex alignment = complex_init_cartesian(0, 0);
+    int alignment_count;
 
     for (int i = 0; i < birds.nb; i++) {
         float dist = complex_get_distance_diff(birds.bird[i].pos, birds.bird[eval].pos);
-        if (dist > 0 && dist < alignement_field.val) {
-            alignement = alignement + birds.bird[i].velocity;
-            alignement_count++;
+        if (dist > 0 && dist < alignment_field.val) {
+            alignment = alignment + birds.bird[i].velocity;
+            alignment_count++;
         }
     }
-    if (alignement_count > 0) {
-        alignement = complex_normalize(alignement / (float)alignement_count) * velocity_weight.val;
-        alignement = complex_stage(alignement - birds.bird[eval].velocity, physical_weight.val);
+    if (alignment_count > 0) {
+        alignment = complex_normalize(alignment / (float)alignment_count) * velocity_weight.val;
+        alignment = complex_stage(alignment - birds.bird[eval].velocity, physical_weight.val);
     }
-    return (alignement);
+    return (alignment);
 }
 
 /**
@@ -330,15 +428,15 @@ void bird_update(BirdGroup &birds)
 {
     for (int i = 0; i < birds.nb; i++) {
         Complex repulsion = bird_repulsion(birds, i); // compute the repulsion
-        Complex alignement = bird_alignement(birds, i); // compute the alignement
+        Complex alignment = bird_alignment(birds, i); // compute the alignment
         Complex cohesion = bird_cohesion(birds, i); // compute the cohesion
 
         repulsion = repulsion * repulsion_weight.val; // weight the repulsion by the given qunatity
-        alignement = alignement * alignement_weight.val; // weight the alignement by the given qunatity
+        alignment = alignment * alignment_weight.val; // weight the alignment by the given qunatity
         cohesion  = cohesion * cohesion_weight.val;  // weight the cohesion by the given qunatity
 
         birds.bird[i].acc = birds.bird[i].acc + repulsion; // add the repulsion vector to the acceleration
-        birds.bird[i].acc = birds.bird[i].acc + alignement; // add the alignement vector to the acceleration
+        birds.bird[i].acc = birds.bird[i].acc + alignment; // add the alignment vector to the acceleration
         birds.bird[i].acc = birds.bird[i].acc + cohesion; // add the cohesion vector to the acceleration
         
         birds.bird[i].acc = birds.bird[i].acc * acceleration_weight.val; // weight the acceleration
@@ -390,13 +488,13 @@ void handle_input(BirdGroup &birds)
     if (isKeyPressed(SDLK_3))
         input_focus = &cohesion_weight;
     if (isKeyPressed(SDLK_2))
-        input_focus = &alignement_weight;
+        input_focus = &alignment_weight;
     if (isKeyPressed(SDLK_1))
         input_focus = &repulsion_weight;
     if (isKeyPressed(SDLK_6))
         input_focus = &cohesion_field;
     if (isKeyPressed(SDLK_5))
-        input_focus = &alignement_field;
+        input_focus = &alignment_field;
     if (isKeyPressed(SDLK_4))
         input_focus = &repulsion_field;
     if (isKeyPressed(SDLK_9))
@@ -463,14 +561,14 @@ void dynamic_simulation_information(void)
     color(120, 144, 156, 255);
     print(190, 0,  "cohesion weight (3):");
     dynamic_information_focus(190 + 165, 0, &cohesion_weight);
-    print(190, 16, "alignement weight (2):");
-    dynamic_information_focus(190 + 165, 16, &alignement_weight);
+    print(190, 16, "alignment weight (2):");
+    dynamic_information_focus(190 + 165, 16, &alignment_weight);
     print(190, 16 * 2, "repulsion weight (1):");
     dynamic_information_focus(190 + 165, 16 * 2, &repulsion_weight);
     print(400, 0, "cohesion field (6):");
     dynamic_information_focus(350 + 200, 0, &cohesion_field);
-    print(400, 16, "alignement field (5):");
-    dynamic_information_focus(350 + 200, 16, &alignement_field);
+    print(400, 16, "alignment field (5):");
+    dynamic_information_focus(350 + 200, 16, &alignment_field);
     print(400, 16 * 2, "repulsion field (4):");
     dynamic_information_focus(350 + 200, 16 * 2, &repulsion_field);
     print(600, 0, "physical weight (9):");
