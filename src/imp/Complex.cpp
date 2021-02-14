@@ -1,94 +1,125 @@
 # include "Complex.hpp"
+# include <math.h>
 
-Complex operator+(Complex a, Complex b)
+Complex::Complex(Point p)
 {
-    a.x += b.x;
-    a.y += b.y;
-    return (a);
+    _x = p.x;
+    _y = p.y;
 }
 
-Complex operator-(Complex a, Complex b)
+Complex::Complex(float radius, float deg)
 {
-    a.x -= b.x;
-    a.y -= b.y;
-    return (a);
+    _x = radius * (float)cos(deg / 180.0 * M_PI);
+    _y = radius * (float)sin(deg / 180.0 * M_PI);
 }
 
-Complex operator*(Complex a, Complex b)
+Complex::~Complex() {}
+
+float Complex::x() const
 {
-    Complex ret = {
-        .x = a.x * b.x - a.y * b.y,
-        .y = a.x * b.y + a.y * b.x
-    };
-    return (ret);
+    return (_x);
 }
 
-Complex operator*(Complex a, float scalar)
+float Complex::y() const
 {
-    a.x = a.x * scalar;
-    a.y = a.y * scalar;
-    return (a);
+    return (_y);
 }
 
-Complex operator/(Complex a, float scalar)
+void Complex::set_x(float x)
 {
-    Complex ret = {
-        .x = a.x / scalar,
-        .y = a.y / scalar
-    };
-    return (ret);
+    _x = x;
 }
 
-Complex complex_init_cartesian(float x, float y)
+void Complex::set_y(float y)
 {
-    Complex ini = {
-        .x = x,
-        .y = y
-    };
-    return (ini);
+    _y = y;
 }
 
-Complex complex_init_polar(float radius, float deg)
+void Complex::set(float x, float y)
 {
-    Complex ini = {
-        .x = radius * (float)cos(deg / 180.0 * M_PI),
-        .y = radius * (float)sin(deg / 180.0 * M_PI)
-    };
-    return (ini);
+    _x = x;
+    _y = y;
 }
 
-float complex_get_angle(Complex a)
+Complex operator+(const Complex &a, const Complex &b)
 {
-    return ((float)atan2(a.x, -a.y) * 180 / M_PI);
+    return Complex(Point(
+        a.x() + b.x(),
+        a.y() + b.y()
+    ));
 }
 
-float complex_get_radius(Complex a)
+Complex operator-(const Complex &a, const Complex &b)
 {
-    return ((float)sqrt(pow(a.x, 2) + pow(a.y, 2)));
+    return Complex(Point(
+        a.x() - b.x(),
+        a.y() - b.y()
+    ));
 }
 
-float complex_get_distance_diff(Complex a, Complex b)
+Complex operator*(const Complex &a, const Complex &b)
 {
-    return ((float)sqrt(pow(a.x - b.x, 2) + pow(a.y - b.y, 2)));
+    return Complex(Point(
+        a.x() * b.x() - a.y() * b.y(),
+        a.x() * b.y() + a.y() * b.x()
+    ));
 }
 
-Complex complex_stage(Complex a, float stage)
+Complex operator*(const Complex &a, float scalar)
 {
-    float cur = complex_get_radius(a);
+    return Complex(Point(
+        a.x() * scalar,
+        a.y() * scalar
+    ));
+}
 
-    if (cur > stage) {
-        return (a / cur);
+Complex operator/(const Complex &a, float scalar)
+{
+    return Complex(Point(
+        a.x() / scalar,
+        a.y() / scalar
+    ));
+}
+
+float Complex::get_angle(void) const
+{
+    return ((float)atan2(_x, -_y) * 180 / M_PI);
+}
+
+float Complex::get_radius(void) const
+{
+    return ((float)sqrt(pow(_x, 2) + pow(_y, 2)));
+}
+
+float Complex::get_distance_diff(const Complex &b) const
+{
+    return ((float)sqrt(pow(_x - b.x(), 2) + pow(_y - b.y(), 2)));
+}
+
+Complex Complex::stage(float stage) const
+{
+    float rad = get_radius();
+
+    if (rad > stage) {
+        return (*this / rad);
     }
-    return (a);
+    return (*this);
 }
 
-Complex complex_normalize(Complex a)
+Complex Complex::normalize() const
 {
-    float rad = complex_get_radius(a);
+    float rad = get_radius();
 
     if (rad) {
-        a.x = a.x / rad;
-        a.y = a.y / rad;
+        return (*this / rad);
     }
-    return (a);
+    return (*this);
+}
+
+void operator<<(std::ostream &off, const Complex &a)
+{
+    if (a.y() < 0)
+        off << a.x() << " " << a.y() << " i\n";
+    else 
+        off << a.x() << " + " << a.y() << " i\n";
 }

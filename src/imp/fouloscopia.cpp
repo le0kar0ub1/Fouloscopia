@@ -43,8 +43,7 @@ void handle_input(BoidGroup &boids)
 {
     if (isKeyPressed(SDLK_RETURN))
         for (int i = 0; i < BOID_BY_GROUP; i++) {
-            boids.boid[i].pos.x = 0;
-            boids.boid[i].pos.y = 0;
+            boids.boid[i].pos.set(0, 0);
         }
     if (isKeyPressed(SDLK_SPACE))
         updating = !updating;

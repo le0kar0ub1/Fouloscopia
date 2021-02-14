@@ -9,12 +9,11 @@ void boid_init(BoidGroup &boids, int nb)
     Color color = Color(255, 255, 255, 255);
 
     for (int i = 0; i < nb; i++) {
-        boids.boid[i].pos.x = 0;
-        boids.boid[i].pos.y = 0;
+        boids.boid[i].pos = Complex(Point(0, 0));
         boids.boid[i].deg = rand() % 360;
         boids.boid[i].color = color;
-        boids.boid[i].velocity = complex_init_cartesian(rand() % 2 - 1, rand() % 2 - 1);
-        boids.boid[i].acc = complex_init_cartesian(0, 0);
+        boids.boid[i].velocity = Complex(Point(rand() % 2 - 1, rand() % 2 - 1));
+        boids.boid[i].acc = Complex(Point(0, 0));
         boids.boid[i].health.state = CLEAN;
         boids.boid[i].health.infected_clock = 0;
     }
@@ -31,19 +30,19 @@ void boid_draw(BoidGroup &boids)
             continue;
         int deg;
         if (grouping) {
-            deg = ((int)complex_get_angle(boids.boid[i].velocity) + 90) % 360;
+            deg = ((int)boids.boid[i].velocity.get_angle() + 90) % 360;
         } else {
             deg = boids.boid[i].deg + 180;
         }
-        Complex p2 = complex_init_polar(boid_size.val, (deg - (int)boid_size.val * 2) % 360);
+        Complex p2 = Complex(boid_size.val, (deg - (int)boid_size.val * 2) % 360);
         p2 = p2 + boids.boid[i].pos;
-        Complex p3 = complex_init_polar(boid_size.val, (deg + (int)boid_size.val * 2) % 360);
+        Complex p3 = Complex(boid_size.val, (deg + (int)boid_size.val * 2) % 360);
         p3 = p3 + boids.boid[i].pos;
         color(boids.boid[i].color.r, boids.boid[i].color.g, boids.boid[i].color.b, boids.boid[i].color.a);
         triangleFill(
-            (int)boids.boid[i].pos.x + MAX_X, (int)boids.boid[i].pos.y + MAX_Y,
-            (int)p2.x + MAX_X, (int)p2.y + MAX_Y,
-            (int)p3.x + MAX_X, (int)p3.y + MAX_Y
+            (int)boids.boid[i].pos.x() + MAX_X, (int)boids.boid[i].pos.y() + MAX_Y,
+            (int)p2.x() + MAX_X, (int)p2.y() + MAX_Y,
+            (int)p3.x() + MAX_X, (int)p3.y() + MAX_Y
         );
     }
 }
@@ -54,19 +53,19 @@ void boid_draw(BoidGroup &boids)
 static void boid_handle_world_randomback(Boid &boid)
 {
     int randomed = (rand() % 90) - 45;
-    if (boid.pos.x < (-MAX_X + boid_size.val)) {
+    if (boid.pos.x() < (-MAX_X + boid_size.val)) {
         if ((boid.deg >= 90 && boid.deg <= 180) || (boid.deg >= 180 && boid.deg <= 270)) {
             boid.deg = ((boid.deg + 180 + randomed) % 360);
         }
-    } else if (boid.pos.y > (MAX_Y - boid_size.val))  {
+    } else if (boid.pos.y() > (MAX_Y - boid_size.val))  {
         if ((boid.deg >= 90 && boid.deg <= 180) || (boid.deg > 0 && boid.deg < 90)) {
             boid.deg = ((boid.deg + 180 + randomed) % 360);
         }
-    } else if (boid.pos.y < (-MAX_Y + boid_size.val)) {
+    } else if (boid.pos.y() < (-MAX_Y + boid_size.val)) {
         if ((boid.deg >= 180 && boid.deg <= 270) || (boid.deg >= 270 && boid.deg <= 360)) {
             boid.deg = ((boid.deg + 180 + randomed) % 360);
         }
-    } else if (boid.pos.x > (MAX_X - boid_size.val)) {
+    } else if (boid.pos.x() > (MAX_X - boid_size.val)) {
         if ((boid.deg >= 0 && boid.deg <= 90) || (boid.deg >= 270 && boid.deg <= 360)) {
             boid.deg = ((boid.deg + 180 + randomed) % 360);
         }
@@ -78,25 +77,25 @@ static void boid_handle_world_randomback(Boid &boid)
  */
 static void boid_handle_world_geometric(Boid &boid)
 {
-    if (boid.pos.x < (-MAX_X + boid_size.val)) {
+    if (boid.pos.x() < (-MAX_X + boid_size.val)) {
         if (boid.deg >= 90 && boid.deg <= 180) {
             boid.deg = (boid.deg - 90) % 360;
         } else if (boid.deg >= 180 && boid.deg <= 270) {
             boid.deg = (boid.deg + 90) % 360;
         }
-    } else if (boid.pos.y > (MAX_Y - boid_size.val))  {
+    } else if (boid.pos.y() > (MAX_Y - boid_size.val))  {
         if (boid.deg >= 90 && boid.deg <= 180) {
             boid.deg = (boid.deg + 90) % 360;
         } else if (boid.deg > 0 && boid.deg < 90) {
             boid.deg = 360 + (boid.deg - 90);
         }
-    } else if (boid.pos.y < (-MAX_Y + boid_size.val)) {
+    } else if (boid.pos.y() < (-MAX_Y + boid_size.val)) {
         if (boid.deg >= 180 && boid.deg <= 270) {
             boid.deg = (boid.deg - 90) % 360;
         } else if (boid.deg >= 270 && boid.deg <= 360) {
             boid.deg = (boid.deg + 90) % 360;
         }
-    } else if (boid.pos.x > (MAX_X - boid_size.val)) {
+    } else if (boid.pos.x() > (MAX_X - boid_size.val)) {
         if (boid.deg >= 0 && boid.deg <= 90) {
             boid.deg = (boid.deg + 90) % 360;
         } else if (boid.deg >= 270 && boid.deg <= 360) {
@@ -110,14 +109,14 @@ static void boid_handle_world_geometric(Boid &boid)
  */
 static void boid_handle_world_infinite(Boid &boid)
 {
-    if (boid.pos.x < -MAX_X)
-        boid.pos.x += MAX_X * 2;
-    if (boid.pos.x > MAX_X)
-        boid.pos.x -= MAX_X * 2;
-    if (boid.pos.y < -MAX_Y)
-        boid.pos.y += MAX_Y * 2;
-    if (boid.pos.y > MAX_Y)
-        boid.pos.y -= MAX_Y * 2;
+    if (boid.pos.x() < -MAX_X)
+        boid.pos.set_x(boid.pos.x() + MAX_X * 2);
+    if (boid.pos.x() > MAX_X)
+        boid.pos.set_x(boid.pos.x() - MAX_X * 2);
+    if (boid.pos.y() < -MAX_Y)
+        boid.pos.set_y(boid.pos.y() + MAX_Y * 2);
+    if (boid.pos.y() > MAX_Y)
+        boid.pos.set_y(boid.pos.y() - MAX_Y * 2);
 }
 
 /**
@@ -157,22 +156,22 @@ void boid_random_life(BoidGroup &boids)
  */
 static Complex boid_repulsion(BoidGroup &boids, int eval)
 {
-    Complex repulsion = complex_init_cartesian(0, 0);
+    Complex repulsion = Complex(Point(0, 0));
     int repulsion_count;
 
     for (int i = 0; i < boids.nb; i++) {
-        float dist = complex_get_distance_diff(boids.boid[i].pos, boids.boid[eval].pos);
+        float dist = boids.boid[i].pos.get_distance_diff(boids.boid[eval].pos);
         if (dist > 0 && dist < repulsion_field.val) {
-            repulsion = repulsion + (complex_normalize(boids.boid[eval].pos - boids.boid[i].pos) / dist);
+            repulsion = repulsion + ((boids.boid[eval].pos - boids.boid[i].pos).normalize() / dist);
             repulsion_count++;
         }
     }
     if (repulsion_count > 0) {
         repulsion = repulsion / (float)repulsion_count;
     }
-    if (complex_get_radius(repulsion) > 0) {
-        repulsion = (complex_normalize(repulsion) * velocity_weight.val) - boids.boid[eval].velocity;
-        repulsion = complex_stage(repulsion, physical_weight.val);
+    if (repulsion.get_radius() > 0) {
+        repulsion = (repulsion.normalize() * velocity_weight.val) - boids.boid[eval].velocity;
+        repulsion = repulsion.stage(physical_weight.val);
     }
     return (repulsion);
 }
@@ -182,19 +181,19 @@ static Complex boid_repulsion(BoidGroup &boids, int eval)
  */
 static Complex boid_alignment(BoidGroup &boids, int eval)
 {
-    Complex alignment = complex_init_cartesian(0, 0);
+    Complex alignment = Complex(Point(0, 0));
     int alignment_count;
 
     for (int i = 0; i < boids.nb; i++) {
-        float dist = complex_get_distance_diff(boids.boid[i].pos, boids.boid[eval].pos);
+        float dist = boids.boid[i].pos.get_distance_diff(boids.boid[eval].pos);
         if (dist > 0 && dist < alignment_field.val) {
             alignment = alignment + boids.boid[i].velocity;
             alignment_count++;
         }
     }
     if (alignment_count > 0) {
-        alignment = complex_normalize(alignment / (float)alignment_count) * velocity_weight.val;
-        alignment = complex_stage(alignment - boids.boid[eval].velocity, physical_weight.val);
+        alignment = (alignment / (float)alignment_count).normalize() * velocity_weight.val;
+        alignment = (alignment - boids.boid[eval].velocity).stage(physical_weight.val);
     }
     return (alignment);
 }
@@ -204,11 +203,11 @@ static Complex boid_alignment(BoidGroup &boids, int eval)
  */
 static Complex boid_cohesion(BoidGroup &boids, int eval)
 {
-    Complex cohesion = complex_init_cartesian(0, 0);
+    Complex cohesion = Complex(Point(0, 0));
     int cohesion_count;
 
     for (int i = 0; i < boids.nb; i++) {;
-        float dist = complex_get_distance_diff(boids.boid[i].pos, boids.boid[eval].pos);
+        float dist = boids.boid[i].pos.get_distance_diff(boids.boid[eval].pos);
         if (dist > 0 && dist < cohesion_field.val) {;
             cohesion = cohesion + boids.boid[i].pos;
             cohesion_count++;
@@ -216,10 +215,10 @@ static Complex boid_cohesion(BoidGroup &boids, int eval)
     }
     if (cohesion_count > 0) {
         cohesion = cohesion / (float)cohesion_count;
-        cohesion = complex_init_polar(0, 0) - cohesion;
-        cohesion = (complex_normalize(cohesion) * velocity_weight.val);
+        cohesion = Complex(0, 0) - cohesion;
+        cohesion = (cohesion.normalize() * velocity_weight.val);
         boids.boid[eval].acc = cohesion - boids.boid[eval].velocity;
-        boids.boid[eval].acc = complex_stage(boids.boid[eval].acc, physical_weight.val);
+        boids.boid[eval].acc = boids.boid[eval].acc.stage(physical_weight.val);
     }
     return (cohesion);
 }
@@ -246,10 +245,10 @@ void boid_update(BoidGroup &boids)
         
         boids.boid[i].acc = boids.boid[i].acc * acceleration_weight.val; // weight the acceleration
         if (grouping) {
-            boids.boid[i].velocity = complex_stage(boids.boid[i].velocity + boids.boid[i].acc, velocity_weight.val);
+            boids.boid[i].velocity = (boids.boid[i].velocity + boids.boid[i].acc).stage(velocity_weight.val);
             boids.boid[i].pos = boids.boid[i].pos + boids.boid[i].velocity * velocity_weight.val;
         } else {
-            boids.boid[i].velocity = complex_init_polar(velocity_weight.val, boids.boid[i].deg);
+            boids.boid[i].velocity = Complex(velocity_weight.val, boids.boid[i].deg);
             boids.boid[i].pos = boids.boid[i].pos + boids.boid[i].velocity;
         }
         boids.boid[i].acc = boids.boid[i].acc * 0; // reset acc
@@ -295,7 +294,7 @@ void update_health(BoidGroup &boids)
             } else { // infect other friends
                 for (int j = 0; j < boids.nb; j++) {
                     if (boids.boid[j].health.state == CLEAN && j != i) {
-                        float dist = complex_get_distance_diff(boids.boid[i].pos, boids.boid[j].pos);
+                        float dist = boids.boid[i].pos.get_distance_diff(boids.boid[j].pos);
                         if (dist < radius_propagation.val && propagation_random(1000, propagation_probability.val / (infection_duration.val * HEALTH_STEP))) {
                             boid_clean.val -= 1;
                             boid_infected.val += 1;
