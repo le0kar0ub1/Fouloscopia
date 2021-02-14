@@ -12,7 +12,7 @@ using namespace grapic;
 
 # define HEALTH_STEP 2
 
-# define BIRD_BY_GROUP 300 // number of boid by group
+# define BOID_BY_GROUP 300 // number of boid by group
 
 enum WORLD_TYPE
 {
@@ -62,7 +62,7 @@ public:
     Quantity deathrate = Quantity(0.4, 0.02);
     Quantity infection_duration = Quantity(10, 2 );
 
-    Quantity boid_clean = Quantity(BIRD_BY_GROUP, 0);
+    Quantity boid_clean = Quantity(BOID_BY_GROUP, 0);
     Quantity boid_infected = Quantity(0, 0);
     Quantity boid_immune = Quantity(0, 0);
     Quantity boid_dead = Quantity(0, 0);

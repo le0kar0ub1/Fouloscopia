@@ -5,7 +5,7 @@ Fouloscopia::Fouloscopia()
 {
     this->number = 0;
 
-    while (this->number < BIRD_BY_GROUP) {
+    while (this->number < BOID_BY_GROUP) {
         this->boids.push_back(Boid());
         this->number++;
     }
@@ -25,7 +25,7 @@ void Fouloscopia::init()
     srand(time(NULL));
 
     // auto boid = this->boids.begin();
-    // std::advance(boid, rand() % BIRD_BY_GROUP);
+    // std::advance(boid, rand() % BOID_BY_GROUP);
     // boid->set_health(INFECTED);
     // boid->set_color(Color(255, 0, 0, 255));
     // boid_infected.val += 1;
