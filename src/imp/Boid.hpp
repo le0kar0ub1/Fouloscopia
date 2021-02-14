@@ -6,6 +6,8 @@
 
 # define BOID_BY_GROUP 300 // number of boid by group
 
+# define HEALTH_STEP 2
+
 struct Color
 {
     int r;
@@ -51,5 +53,6 @@ void boid_draw(BoidGroup &boids);
 void boid_handle_world(BoidGroup &boids);
 void boid_random_life(BoidGroup &boids);
 void boid_update(BoidGroup &boids);
+void update_health(BoidGroup &boids);
 
 #endif /* __BOID_HPP__ */

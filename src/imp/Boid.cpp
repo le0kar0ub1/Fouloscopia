@@ -255,3 +255,56 @@ void boid_update(BoidGroup &boids)
         boids.boid[i].acc = boids.boid[i].acc * 0; // reset acc
     }
 }
+
+/**
+ * Built-in random to fight against low probability
+ */
+static bool propagation_random(float max, float proba)
+{
+    return ((rand() % (int)max) < (int)(proba * max));
+}
+
+/**
+ *  Update boid health
+ */
+void update_health(BoidGroup &boids)
+{
+    for (int i = 0; i < boids.nb; i++) {
+        // IMMUNE: make it simple and keep immunity forever, in fact it's obv not the case
+        // CLEAN: clean boid make nothing
+        // DEAD: dead boid can't revive, hard truth :/
+        // INFECTED: infect others and die if no chance
+        // All the probability are weighted by the disease time and update call to get as close as possible to the usual usage of r0 etc...
+        if (boids.boid[i].health.state == INFECTED) {
+            if (propagation_random(1000, deathrate.val / (infection_duration.val * HEALTH_STEP))) { // die if the life isn't nice
+                boids.boid[i].health.state = DEAD;
+                boid_infected.val -= 1;
+                boid_dead.val += 1;
+            } else if (boids.boid[i].health.infected_clock++ == (infection_duration.val * HEALTH_STEP)) { // cure if the life is nice and become IMMUNE or CLEAN depend of the immunity weight
+                boids.boid[i].health.infected_clock = 0;
+                boid_infected.val -= 1;
+                if (propagation_random(1000, immunity_weight.val)) {
+                    boid_immune.val += 1;
+                    boids.boid[i].health.state = IMMUNE;
+                    boids.boid[i].color = Color(0, 255, 0, 255);
+                } else {
+                    boid_clean.val += 1;
+                    boids.boid[i].health.state = CLEAN;
+                    boids.boid[i].color = Color(255, 255, 255, 255);
+                }
+            } else { // infect other friends
+                for (int j = 0; j < boids.nb; j++) {
+                    if (boids.boid[j].health.state == CLEAN && j != i) {
+                        float dist = complex_get_distance_diff(boids.boid[i].pos, boids.boid[j].pos);
+                        if (dist < radius_propagation.val && propagation_random(1000, propagation_probability.val / (infection_duration.val * HEALTH_STEP))) {
+                            boid_clean.val -= 1;
+                            boid_infected.val += 1;
+                            boids.boid[j].health.state = INFECTED;
+                            boids.boid[j].color = Color(255, 0, 0, 255);
+                        }
+                    }
+                }
+            }   
+        }
+    }
+}
