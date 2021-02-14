@@ -6,14 +6,15 @@ Fouloscopia::Fouloscopia()
     this->number = 0;
 
     while (this->number < BOID_BY_GROUP) {
-        this->boids.push_back(Boid());
+        boids[this->number] = Boid();
+        // this->boids.push_back(boid);
         this->number++;
     }
 }
 
 Fouloscopia::~Fouloscopia()
 {
-    this->boids.clear();
+    // this->boids.clear();
 }
 
 void Fouloscopia::init()
@@ -26,15 +27,11 @@ void Fouloscopia::init()
 
     // auto boid = this->boids.begin();
     // std::advance(boid, rand() % BOID_BY_GROUP);
-    // boid->set_health(INFECTED);
-    // boid->set_color(Color(255, 0, 0, 255));
-    // boid_infected.val += 1;
-    // boid_clean.val -= 1;
-}
-
-void Fouloscopia::exit()
-{
-    winQuit();
+    int randomed = rand() % BOID_BY_GROUP;
+    boids[randomed].set_health(INFECTED);
+    boids[randomed].set_color(Color(255, 0, 0, 255));
+    boid_infected.val += 1;
+    boid_clean.val -= 1;
 }
 
 /**
@@ -43,8 +40,8 @@ void Fouloscopia::exit()
 void Fouloscopia::handle_input()
 {
     if (isKeyPressed(SDLK_RETURN))
-        for (auto boid = this->boids.begin(); boid != this->boids.end(); boid++)
-            boid->set_pos(0, 0);
+        for (int i = 0; i < BOID_BY_GROUP; i++)
+            boids[i].set_pos(0, 0);
     if (isKeyPressed(SDLK_SPACE))
         updating = !updating;
 
@@ -219,28 +216,28 @@ void Fouloscopia::run()
             healthtrigger = true;
             clock++;
         }
-        for (auto boid = this->boids.begin(); boid != this->boids.end(); boid++) {
+        for (int i = 0; i < BOID_BY_GROUP; i++) {
             if (updating) {
                 if (randoming) {
-                    boid->random_life(); // the life being unpredictable, put a little bit of random
+                    boids[i].random_life(); // the life being unpredictable, put a little bit of random
                 }
-                boid->update_pos(); // update the boid position
-                boid->handle_world(); // handle world depending on given rules
+                boids[i].update_position(); // update the boid position
+                boids[i].handle_world(); // handle world depending on given rules
                 if (healthtrigger) {
-                    boid->update_health();
+                    boids[i].update_health();
                 }
             }
-            std::cout << boid->pos();
+            boids[i].draw();
         }
         if (healthtrigger) {
             healthtrigger = false;
         }
         dynamic_health_information(); // display boid health information
         dynamic_simulation_information(); // display the dynamic information for the user
-        winDisplay();
         handle_input(); // handle user inputs
+        winDisplay();
         delay(10);
     }
 
-    exit();
+    winQuit();
 }

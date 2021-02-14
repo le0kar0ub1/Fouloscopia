@@ -1,6 +1,6 @@
 CXX		:=	g++
 
-target  := src/imp
+target  := src/oop
 
 TARGET	:=	fouloscopia.bin
 

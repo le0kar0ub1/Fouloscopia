@@ -12,7 +12,7 @@ void boid_init(BoidGroup &boids, int nb)
         boids.boid[i].pos = Complex(Point(0, 0));
         boids.boid[i].deg = rand() % 360;
         boids.boid[i].color = color;
-        boids.boid[i].velocity = Complex(Point(rand() % 2 - 1, rand() % 2 - 1));
+        boids.boid[i].velocity = Complex(Point(rand() % 3 - 1, rand() % 3 - 1));
         boids.boid[i].acc = Complex(Point(0, 0));
         boids.boid[i].health.state = CLEAN;
         boids.boid[i].health.infected_clock = 0;
@@ -160,7 +160,7 @@ static Complex boid_repulsion(BoidGroup &boids, int eval)
     int repulsion_count;
 
     for (int i = 0; i < boids.nb; i++) {
-        float dist = boids.boid[i].pos.get_distance_diff(boids.boid[eval].pos);
+        float dist = boids.boid[i].pos.get_distance(boids.boid[eval].pos);
         if (dist > 0 && dist < repulsion_field.val) {
             repulsion = repulsion + ((boids.boid[eval].pos - boids.boid[i].pos).normalize() / dist);
             repulsion_count++;
@@ -185,7 +185,7 @@ static Complex boid_alignment(BoidGroup &boids, int eval)
     int alignment_count;
 
     for (int i = 0; i < boids.nb; i++) {
-        float dist = boids.boid[i].pos.get_distance_diff(boids.boid[eval].pos);
+        float dist = boids.boid[i].pos.get_distance(boids.boid[eval].pos);
         if (dist > 0 && dist < alignment_field.val) {
             alignment = alignment + boids.boid[i].velocity;
             alignment_count++;
@@ -207,7 +207,7 @@ static Complex boid_cohesion(BoidGroup &boids, int eval)
     int cohesion_count;
 
     for (int i = 0; i < boids.nb; i++) {;
-        float dist = boids.boid[i].pos.get_distance_diff(boids.boid[eval].pos);
+        float dist = boids.boid[i].pos.get_distance(boids.boid[eval].pos);
         if (dist > 0 && dist < cohesion_field.val) {;
             cohesion = cohesion + boids.boid[i].pos;
             cohesion_count++;
@@ -294,7 +294,7 @@ void update_health(BoidGroup &boids)
             } else { // infect other friends
                 for (int j = 0; j < boids.nb; j++) {
                     if (boids.boid[j].health.state == CLEAN && j != i) {
-                        float dist = boids.boid[i].pos.get_distance_diff(boids.boid[j].pos);
+                        float dist = boids.boid[i].pos.get_distance(boids.boid[j].pos);
                         if (dist < radius_propagation.val && propagation_random(1000, propagation_probability.val / (infection_duration.val * HEALTH_STEP))) {
                             boid_clean.val -= 1;
                             boid_infected.val += 1;

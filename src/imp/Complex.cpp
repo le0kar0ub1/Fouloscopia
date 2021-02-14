@@ -91,7 +91,7 @@ float Complex::get_radius(void) const
     return ((float)sqrt(pow(_x, 2) + pow(_y, 2)));
 }
 
-float Complex::get_distance_diff(const Complex &b) const
+float Complex::get_distance(const Complex &b) const
 {
     return ((float)sqrt(pow(_x - b.x(), 2) + pow(_y - b.y(), 2)));
 }

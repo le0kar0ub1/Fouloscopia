@@ -4,11 +4,10 @@
 
 Boid::Boid()
 {
-    // _pos = Complex(Point(rand() % 900 - 400, rand() % 900 - 400));
     _pos = Complex(Point(0, 0));
     _deg = rand() % 360;
     _color = Color(255, 255, 255, 255);
-    _velocity = Complex(Point(rand() % 2 - 1, rand() % 2 - 1));
+    _velocity = Complex(Point(rand() % 3 - 1, rand() % 3 - 1));
     _acc = Complex(Point(0, 0));
     _health.state = CLEAN;
     _health.infected_clock = 0;
@@ -168,10 +167,10 @@ Complex Boid::repulsion(void)
     Complex repulsion(Point(0, 0));
     int repulsion_count;
 
-    for (auto boid = simulation.boids.begin(); boid != simulation.boids.end(); boid++) {
-        float dist = _pos.get_distance_diff(boid->_pos);
+    for (int i = 0; i != BOID_BY_GROUP; i++) {
+        float dist = _pos.get_distance(simulation.boids[i]._pos);
         if (dist > 0 && dist < simulation.repulsion_field.val) {
-            repulsion = repulsion + ((_pos - boid->_pos).normalize() / dist);
+            repulsion = repulsion + ((_pos - simulation.boids[i]._pos).normalize() / dist);
             repulsion_count++;
         }
     }
@@ -193,10 +192,10 @@ Complex Boid::alignment(void)
     Complex alignment(Point(0, 0));
     int alignment_count;
 
-    for (auto boid = simulation.boids.begin(); boid != simulation.boids.end(); boid++) {
-        float dist = _pos.get_distance_diff(boid->_pos);
+    for (int i = 0; i != BOID_BY_GROUP; i++) {
+        float dist = _pos.get_distance(simulation.boids[i]._pos);
         if (dist > 0 && dist < simulation.alignment_field.val) {
-            alignment = alignment + boid->_velocity;
+            alignment = alignment + simulation.boids[i]._velocity;
             alignment_count++;
         }
     }
@@ -215,10 +214,10 @@ Complex Boid::cohesion(void)
     Complex cohesion(Point(0, 0));
     int cohesion_count;
 
-    for (auto boid = simulation.boids.begin(); boid != simulation.boids.end(); boid++){;
-        float dist = _pos.get_distance_diff(boid->_pos);
+    for (int i = 0; i != BOID_BY_GROUP; i++){;
+        float dist = _pos.get_distance(simulation.boids[i]._pos);
         if (dist > 0 && dist < simulation.cohesion_field.val) {;
-            cohesion = cohesion + boid->_pos;
+            cohesion = cohesion + simulation.boids[i]._pos;
             cohesion_count++;
         }
     }
@@ -236,7 +235,7 @@ Complex Boid::cohesion(void)
  * All of the update isn't well defined, in fact it's a heap of scalar which we can modulate to obtain more or less a group
  * I (actually) don't think that the current parameters are the best one
  */
-void Boid::update_pos(void)
+void Boid::update_position(void)
 {
     Complex repulsion = this->repulsion(); // compute the repulsion
     Complex alignment = this->alignment(); // compute the alignment
@@ -295,14 +294,14 @@ void Boid::update_health()
                 _color = Color(255, 255, 255, 255);
             }
         } else { // infect other friends
-            for (auto boid = simulation.boids.begin(); boid != simulation.boids.end(); boid++) {
-                if (boid->_health.state == CLEAN) {
-                    float dist = _pos.get_distance_diff(boid->_pos);
+            for (int i = 0; i != BOID_BY_GROUP; i++) {
+                if (simulation.boids[i]._health.state == CLEAN) {
+                    float dist = _pos.get_distance(simulation.boids[i]._pos);
                     if (dist < simulation.radius_propagation.val && propagation_random(1000, simulation.propagation_probability.val / (simulation.infection_duration.val * HEALTH_STEP))) {
                         simulation.boid_clean.val -= 1;
                         simulation.boid_infected.val += 1;
-                        boid->_health.state = INFECTED;
-                        boid->_color = Color(255, 0, 0, 255);
+                        simulation.boids[i]._health.state = INFECTED;
+                        simulation.boids[i]._color = Color(255, 0, 0, 255);
                     }
                 }
             }

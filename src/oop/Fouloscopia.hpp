@@ -35,7 +35,8 @@ public:
     void run();
     ~Fouloscopia();
 
-    std::vector<Boid> boids; 
+    // std::vector<Boid> boids;
+    Boid boids[BOID_BY_GROUP];
     int number;
 
     bool grouping = true; // if true, the boids try to make group
@@ -71,7 +72,6 @@ private:
     Quantity *focus = &propagation_probability;
 
     void init();
-    void exit();
     void dynamic_health_information();
     void dynamic_simulation_information();
     void dynamic_information_focus(int x, int y, Quantity *cur);

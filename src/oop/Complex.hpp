@@ -19,7 +19,7 @@ public:
     Complex(float radius, float deg);
     float get_angle(void) const;
     float get_radius(void) const;
-    float get_distance_diff(const Complex &b) const;
+    float get_distance(const Complex &b) const;
     Complex stage(float stage) const;
     Complex normalize() const;
     float x() const;
