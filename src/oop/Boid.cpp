@@ -167,10 +167,10 @@ Complex Boid::repulsion(void)
     Complex repulsion(Point(0, 0));
     int repulsion_count;
 
-    for (int i = 0; i != BOID_BY_GROUP; i++) {
-        float dist = _pos.get_distance(simulation.boids[i]._pos);
+    for ITERATE() {
+        float dist = _pos.get_distance(USE(_pos));
         if (dist > 0 && dist < simulation.repulsion_field.val) {
-            repulsion = repulsion + ((_pos - simulation.boids[i]._pos).normalize() / dist);
+            repulsion = repulsion + ((_pos - USE(_pos)).normalize() / dist);
             repulsion_count++;
         }
     }
@@ -192,10 +192,10 @@ Complex Boid::alignment(void)
     Complex alignment(Point(0, 0));
     int alignment_count;
 
-    for (int i = 0; i != BOID_BY_GROUP; i++) {
-        float dist = _pos.get_distance(simulation.boids[i]._pos);
+    for ITERATE() {
+        float dist = _pos.get_distance(USE(_pos));
         if (dist > 0 && dist < simulation.alignment_field.val) {
-            alignment = alignment + simulation.boids[i]._velocity;
+            alignment = alignment + USE(_velocity);
             alignment_count++;
         }
     }
@@ -214,10 +214,10 @@ Complex Boid::cohesion(void)
     Complex cohesion(Point(0, 0));
     int cohesion_count;
 
-    for (int i = 0; i != BOID_BY_GROUP; i++){;
-        float dist = _pos.get_distance(simulation.boids[i]._pos);
+    for ITERATE(){;
+        float dist = _pos.get_distance(USE(_pos));
         if (dist > 0 && dist < simulation.cohesion_field.val) {;
-            cohesion = cohesion + simulation.boids[i]._pos;
+            cohesion = cohesion + USE(_pos);
             cohesion_count++;
         }
     }
@@ -294,14 +294,14 @@ void Boid::update_health()
                 _color = Color(255, 255, 255, 255);
             }
         } else { // infect other friends
-            for (int i = 0; i != BOID_BY_GROUP; i++) {
-                if (simulation.boids[i]._health.state == CLEAN) {
-                    float dist = _pos.get_distance(simulation.boids[i]._pos);
+            for ITERATE() {
+                if (USE(_health).state == CLEAN) {
+                    float dist = _pos.get_distance(USE(_pos));
                     if (dist < simulation.radius_propagation.val && propagation_random(1000, simulation.propagation_probability.val / (simulation.infection_duration.val * HEALTH_STEP))) {
                         simulation.boid_clean.val -= 1;
                         simulation.boid_infected.val += 1;
-                        simulation.boids[i]._health.state = INFECTED;
-                        simulation.boids[i]._color = Color(255, 0, 0, 255);
+                        USE(_health).state = INFECTED;
+                        USE(_color) = Color(255, 0, 0, 255);
                     }
                 }
             }

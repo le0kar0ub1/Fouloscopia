@@ -28,6 +28,11 @@ struct Quantity // value which user can modulate
     Quantity(float v, float m) {val = v; mod = m;}
 };
 
+// # define ITERATE() (auto i = simulation.boids.begin(); i != simulation.boids.end(); i++)
+// # define USE(x)     i->x
+# define ITERATE() (int i = 0; i != simulation.number; i++)
+# define USE(x)     simulation.boids[i].x
+
 class Fouloscopia
 {
 public:

@@ -6,7 +6,8 @@ Fouloscopia::Fouloscopia()
     this->number = 0;
 
     while (this->number < BOID_BY_GROUP) {
-        boids[this->number] = Boid();
+        Boid boid = Boid();
+        boids[number] = Boid();
         // this->boids.push_back(boid);
         this->number++;
     }
@@ -27,11 +28,10 @@ void Fouloscopia::init()
 
     // auto boid = this->boids.begin();
     // std::advance(boid, rand() % BOID_BY_GROUP);
-    int randomed = rand() % BOID_BY_GROUP;
-    boids[randomed].set_health(INFECTED);
-    boids[randomed].set_color(Color(255, 0, 0, 255));
-    boid_infected.val += 1;
-    boid_clean.val -= 1;
+    // boid->set_health(INFECTED);
+    // boid->set_color(Color(255, 0, 0, 255));
+    // boid_infected.val += 1;
+    // boid_clean.val -= 1;
 }
 
 /**
@@ -39,9 +39,9 @@ void Fouloscopia::init()
  */
 void Fouloscopia::handle_input()
 {
-    if (isKeyPressed(SDLK_RETURN))
-        for (int i = 0; i < BOID_BY_GROUP; i++)
-            boids[i].set_pos(0, 0);
+    // if (isKeyPressed(SDLK_RETURN))
+    //     for ITERATE(boids)
+    //         it->set_pos(0, 0);
     if (isKeyPressed(SDLK_SPACE))
         updating = !updating;
 
@@ -216,18 +216,19 @@ void Fouloscopia::run()
             healthtrigger = true;
             clock++;
         }
-        for (int i = 0; i < BOID_BY_GROUP; i++) {
+
+        for ITERATE() {
             if (updating) {
                 if (randoming) {
-                    boids[i].random_life(); // the life being unpredictable, put a little bit of random
+                    USE(random_life()); // the life being unpredictable, put a little bit of random
                 }
-                boids[i].update_position(); // update the boid position
-                boids[i].handle_world(); // handle world depending on given rules
+                USE(update_position()); // update the boid position
+                USE(handle_world()); // handle world depending on given rules
                 if (healthtrigger) {
-                    boids[i].update_health();
+                    USE(update_health());
                 }
             }
-            boids[i].draw();
+            USE(draw());
         }
         if (healthtrigger) {
             healthtrigger = false;
