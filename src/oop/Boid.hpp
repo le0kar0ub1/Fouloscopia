@@ -31,6 +31,8 @@ class Boid
 {
 public:
     Boid();
+    Boid(const Boid &p2);
+    void operator=(Boid const &a);
     void draw() const;
     void handle_world();
     void random_life();

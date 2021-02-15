@@ -3,19 +3,20 @@
 
 Fouloscopia::Fouloscopia()
 {
-    this->number = 0;
+    int nb = 0;
 
-    while (this->number < BOID_BY_GROUP) {
-        Boid boid = Boid();
-        boids[number] = Boid();
-        // this->boids.push_back(boid);
-        this->number++;
+    boids = new std::vector<Boid *>;
+    while (nb < BOID_NUMBER) {
+        this->boids->push_back(new Boid());
+        nb++;
     }
 }
 
 Fouloscopia::~Fouloscopia()
 {
-    // this->boids.clear();
+    for (auto it = boids->begin(); it != boids->end(); it++)
+        delete *it;
+    delete boids;
 }
 
 void Fouloscopia::init()
@@ -26,12 +27,12 @@ void Fouloscopia::init()
     fontSize(16);
     srand(time(NULL));
 
-    // auto boid = this->boids.begin();
-    // std::advance(boid, rand() % BOID_BY_GROUP);
-    // boid->set_health(INFECTED);
-    // boid->set_color(Color(255, 0, 0, 255));
-    // boid_infected.val += 1;
-    // boid_clean.val -= 1;
+    auto boid = this->boids->begin();
+    std::advance(boid, rand() % BOID_NUMBER);
+    (*boid)->set_health(INFECTED);
+    (*boid)->set_color(Color(255, 0, 0, 255));
+    boid_infected.val += 1;
+    boid_clean.val -= 1;
 }
 
 /**
@@ -39,9 +40,9 @@ void Fouloscopia::init()
  */
 void Fouloscopia::handle_input()
 {
-    // if (isKeyPressed(SDLK_RETURN))
-    //     for ITERATE(boids)
-    //         it->set_pos(0, 0);
+    if (isKeyPressed(SDLK_RETURN))
+        for (auto it = simulation.boids->begin(); it != simulation.boids->end(); it++)
+            (*it)->set_pos(0, 0);
     if (isKeyPressed(SDLK_SPACE))
         updating = !updating;
 
@@ -216,19 +217,18 @@ void Fouloscopia::run()
             healthtrigger = true;
             clock++;
         }
-
-        for ITERATE() {
+        for (auto it = simulation.boids->begin(); it != simulation.boids->end(); it++) {
             if (updating) {
                 if (randoming) {
-                    USE(random_life()); // the life being unpredictable, put a little bit of random
+                    (*it)->random_life(); // the life being unpredictable, put a little bit of random
                 }
-                USE(update_position()); // update the boid position
-                USE(handle_world()); // handle world depending on given rules
+                (*it)->update_position(); // update the boid position
+                (*it)->handle_world(); // handle world depending on given rules
                 if (healthtrigger) {
-                    USE(update_health());
+                    (*it)->update_health();
                 }
             }
-            USE(draw());
+            (*it)->draw();
         }
         if (healthtrigger) {
             healthtrigger = false;
@@ -237,7 +237,7 @@ void Fouloscopia::run()
         dynamic_simulation_information(); // display the dynamic information for the user
         handle_input(); // handle user inputs
         winDisplay();
-        delay(10);
+        // delay(10);
     }
 
     winQuit();

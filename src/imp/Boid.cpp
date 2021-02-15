@@ -157,7 +157,7 @@ void boid_random_life(BoidGroup &boids)
 static Complex boid_repulsion(BoidGroup &boids, int eval)
 {
     Complex repulsion = Complex(Point(0, 0));
-    int repulsion_count;
+    int repulsion_count = 0;
 
     for (int i = 0; i < boids.nb; i++) {
         float dist = boids.boid[i].pos.get_distance(boids.boid[eval].pos);
@@ -182,7 +182,7 @@ static Complex boid_repulsion(BoidGroup &boids, int eval)
 static Complex boid_alignment(BoidGroup &boids, int eval)
 {
     Complex alignment = Complex(Point(0, 0));
-    int alignment_count;
+    int alignment_count = 0;
 
     for (int i = 0; i < boids.nb; i++) {
         float dist = boids.boid[i].pos.get_distance(boids.boid[eval].pos);
@@ -204,7 +204,7 @@ static Complex boid_alignment(BoidGroup &boids, int eval)
 static Complex boid_cohesion(BoidGroup &boids, int eval)
 {
     Complex cohesion = Complex(Point(0, 0));
-    int cohesion_count;
+    int cohesion_count = 0;
 
     for (int i = 0; i < boids.nb; i++) {;
         float dist = boids.boid[i].pos.get_distance(boids.boid[eval].pos);

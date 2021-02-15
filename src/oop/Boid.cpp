@@ -13,6 +13,28 @@ Boid::Boid()
     _health.infected_clock = 0;
 }
 
+Boid::Boid(const Boid &p2)
+{  
+    _pos = p2._pos;
+    _deg = p2._deg;
+    _color = p2._color;
+    _velocity = p2._velocity;
+    _acc = p2._acc;
+    _health.state = p2._health.state;
+    _health.infected_clock = p2._health.infected_clock;
+}
+
+void Boid::operator=(Boid const &p2)
+{
+    _pos = p2._pos;
+    _deg = p2._deg;
+    _color = p2._color;
+    _velocity = p2._velocity;
+    _acc = p2._acc;
+    _health.state = p2._health.state;
+    _health.infected_clock = p2._health.infected_clock;
+}
+
 Boid::~Boid() {}
 
 Complex Boid::pos(void) const
@@ -37,7 +59,7 @@ void Boid::set_color(Color color)
 
 void Boid::draw() const
 {
-    int deg;
+    int deg = 0;
 
     if (_health.state == DEAD)
         return;
@@ -64,6 +86,7 @@ void Boid::draw() const
 void Boid::handle_world_randomback(void)
 {
     int randomed = (rand() % 90) - 45;
+
     if (_pos.x() < (-MAX_X + simulation.boid_size.val)) {
         if ((_deg >= 90 && _deg <= 180) || (_deg >= 180 && _deg <= 270)) {
             _deg = ((_deg + 180 + randomed) % 360);
@@ -165,12 +188,12 @@ void Boid::random_life(void)
 Complex Boid::repulsion(void)
 {
     Complex repulsion(Point(0, 0));
-    int repulsion_count;
+    int repulsion_count = 0;
 
-    for ITERATE() {
-        float dist = _pos.get_distance(USE(_pos));
+    for (auto it = simulation.boids->begin(); it != simulation.boids->end(); it++) {
+        float dist = _pos.get_distance((*it)->_pos);
         if (dist > 0 && dist < simulation.repulsion_field.val) {
-            repulsion = repulsion + ((_pos - USE(_pos)).normalize() / dist);
+            repulsion = repulsion + ((_pos - (*it)->_pos).normalize() / dist);
             repulsion_count++;
         }
     }
@@ -190,12 +213,12 @@ Complex Boid::repulsion(void)
 Complex Boid::alignment(void)
 {
     Complex alignment(Point(0, 0));
-    int alignment_count;
+    int alignment_count = 0;
 
-    for ITERATE() {
-        float dist = _pos.get_distance(USE(_pos));
+    for (auto it = simulation.boids->begin(); it != simulation.boids->end(); it++) {
+        float dist = _pos.get_distance((*it)->_pos);
         if (dist > 0 && dist < simulation.alignment_field.val) {
-            alignment = alignment + USE(_velocity);
+            alignment = alignment + (*it)->_velocity;
             alignment_count++;
         }
     }
@@ -212,12 +235,12 @@ Complex Boid::alignment(void)
 Complex Boid::cohesion(void)
 {
     Complex cohesion(Point(0, 0));
-    int cohesion_count;
+    int cohesion_count = 0;
 
-    for ITERATE(){;
-        float dist = _pos.get_distance(USE(_pos));
+    for (auto it = simulation.boids->begin(); it != simulation.boids->end(); it++){;
+        float dist = _pos.get_distance((*it)->_pos);
         if (dist > 0 && dist < simulation.cohesion_field.val) {;
-            cohesion = cohesion + USE(_pos);
+            cohesion = cohesion + (*it)->_pos;
             cohesion_count++;
         }
     }
@@ -278,7 +301,11 @@ void Boid::update_health()
     // All the probabilities are weighted by the disease time and update call to get as close as possible to the usual usage of r0 etc...
     if (_health.state == INFECTED) {
         if (propagation_random(1000, simulation.deathrate.val / (simulation.infection_duration.val * HEALTH_STEP))) { // die if the life isn't nice
-            _health.state = DEAD;
+            auto it = std::find(simulation.boids->begin(), simulation.boids->end(), &(*this));
+            if (it != simulation.boids->end()) {
+                delete *it;
+                simulation.boids->erase(it);
+            }
             simulation.boid_infected.val -= 1;
             simulation.boid_dead.val += 1;
         } else if (_health.infected_clock++ == (simulation.infection_duration.val * HEALTH_STEP)) { // cure if the life is nice and become IMMUNE or CLEAN depend of the immunity weight
@@ -294,14 +321,14 @@ void Boid::update_health()
                 _color = Color(255, 255, 255, 255);
             }
         } else { // infect other friends
-            for ITERATE() {
-                if (USE(_health).state == CLEAN) {
-                    float dist = _pos.get_distance(USE(_pos));
+            for (auto it = simulation.boids->begin(); it != simulation.boids->end(); it++) {
+                if ((*it)->_health.state == CLEAN) {
+                    float dist = _pos.get_distance((*it)->_pos);
                     if (dist < simulation.radius_propagation.val && propagation_random(1000, simulation.propagation_probability.val / (simulation.infection_duration.val * HEALTH_STEP))) {
                         simulation.boid_clean.val -= 1;
                         simulation.boid_infected.val += 1;
-                        USE(_health).state = INFECTED;
-                        USE(_color) = Color(255, 0, 0, 255);
+                        (*it)->_health.state = INFECTED;
+                        (*it)->_color = Color(255, 0, 0, 255);
                     }
                 }
             }
