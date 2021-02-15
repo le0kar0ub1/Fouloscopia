@@ -1,6 +1,6 @@
 CXX		:=	g++
 
-target  := src/oop
+target ?= oop
 
 TARGET	:=	fouloscopia.bin
 
@@ -24,16 +24,15 @@ LDFLAGS	:=  -L mktoolchain/toolchain/libs    		    	\
 EXTSRC := cpp
 EXTOBJ := o
 
-SRC :=	$(wildcard $(target)/*.$(EXTSRC) $(target)/**/*.$(EXTSRC))
+SRC :=	$(wildcard src/$(target)/*.$(EXTSRC) src/$(target)/**/*.$(EXTSRC))
 
-OBJ := 	$(patsubst $(target)/%.$(EXTSRC), $(BUILDIR)/%.$(EXTOBJ), $(SRC))
+OBJ := 	$(patsubst src/$(target)/%.$(EXTSRC), $(BUILDIR)/%.$(EXTOBJ), $(SRC))
 
-.PHONY: all run clean install target-dir
+.PHONY: all run build clean install
 
-target-dir:
-	@(test -d $(target)) || (echo "Invalid target directory" && exit 1)
+build: $(TARGET)
 
-build: target-dir $(TARGET)
+all: build
 
 project:
 	@mkdir -p $(target)
@@ -45,7 +44,7 @@ $(TARGET): $(OBJ)
 clean:
 	@rm -rf $(BUILDIR) *.bin
 
-$(BUILDIR)/%.$(EXTOBJ): $(target)/%.$(EXTSRC)
+$(BUILDIR)/%.$(EXTOBJ): src/$(target)/%.$(EXTSRC)
 	@mkdir -p $(shell dirname $@)
 	@$(CXX) $(CXXFLAGS) -c $< -o $@
 	@-echo -e "    CXX      $@"

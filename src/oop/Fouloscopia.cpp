@@ -92,6 +92,14 @@ void Fouloscopia::handle_input()
         if (focus->val >= focus->mod)
             focus->val -= focus->mod;
 
+    if (isMousePressed(SDL_BUTTON_LEFT) && simulation.boids->size() < BOID_MAX_NUMBER) {
+        int x, y;
+        mousePos(x, y);
+        Boid *nboid = new Boid();
+        nboid->set_pos(x - MAX_X, y - MAX_Y);
+        simulation.boids->push_back(nboid);
+        simulation.boid_clean.val += 1;
+    }
 }
 
 /**

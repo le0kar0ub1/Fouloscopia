@@ -28,7 +28,7 @@ Local installation handled:
 
 Build the executable:
 
-> make build
+> make [build]
 
 run it;
 
@@ -44,6 +44,7 @@ Runtime basic key trigger.
 
  Key     | Description
 ---------|------------------------------------------
+`\MOUSE` | Press left button of the mouse to drop new clean bird at the current position
 `\SPACE` | Pause the boid update
 `\ENTRY` | Reset all the boid position to 0 (middle of the map)
 `\ESC`   | Quit the program

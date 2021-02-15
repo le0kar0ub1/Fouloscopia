@@ -29,7 +29,7 @@ Quantity immunity_weight = {.val = 0.90, .mod = 0.02};
 Quantity deathrate = {.val = 0.4, .mod = 0.02};
 Quantity infection_duration = {.val = 20, .mod = 2 };
 
-Quantity boid_clean = {.val = BOID_NUMBER, .mod = 0};
+Quantity boid_clean = {.val = BOID_BY_GROUP, .mod = 0};
 Quantity boid_infected = {.val = 0, .mod = 0};
 Quantity boid_immune = {.val = 0, .mod = 0};
 Quantity boid_dead = {.val = 0, .mod = 0};
@@ -42,8 +42,9 @@ Quantity *input_focus = &propagation_probability;
 void handle_input(BoidGroup &boids)
 {
     if (isKeyPressed(SDLK_RETURN))
-        for (int i = 0; i < BOID_NUMBER; i++) {
-            boids.boid[i].pos.set(0, 0);
+        for (int i = 0; i < BOID_BY_GROUP; i++) {
+            boids.boid[i].pos.x = 0;
+            boids.boid[i].pos.y = 0;
         }
     if (isKeyPressed(SDLK_SPACE))
         updating = !updating;
@@ -219,9 +220,9 @@ int main(void)
     fontSize(16);
     srand(time(NULL));
 
-    boid_init(boids, BOID_NUMBER);
+    boid_init(boids, BOID_BY_GROUP);
 
-    randomed = rand() % BOID_NUMBER;
+    randomed = rand() % BOID_BY_GROUP;
     boids.boid[randomed].health.state = INFECTED; // infect a random one
     boids.boid[randomed].color = Color(255, 0, 0, 255);
     boid_clean.val -= 1;

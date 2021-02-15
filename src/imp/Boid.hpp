@@ -4,7 +4,7 @@
 # include "fouloscopia.hpp"
 # include "Complex.hpp"
 
-# define BOID_NUMBER 300 // number of boid by group
+# define BOID_BY_GROUP 300 // number of boid by group
 
 # define HEALTH_STEP 2
 
@@ -44,7 +44,7 @@ struct Boid
 
 struct BoidGroup
 {
-    Boid boid[BOID_NUMBER];
+    Boid boid[BOID_BY_GROUP];
     int nb;
 };
 
