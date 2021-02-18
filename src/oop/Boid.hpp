@@ -38,6 +38,7 @@ public:
     void random_life();
     void set_pos(float x, float y);
     Complex pos(void) const;
+    enum BOID_HEALTH_STATE health(void) const;
     void update_position();
     void update_health();
     void set_health(enum BOID_HEALTH_STATE state);

@@ -99,6 +99,21 @@ void Fouloscopia::handle_input()
         nboid->set_pos(x - MAX_X, y - MAX_Y);
         simulation.boids->push_back(nboid);
         simulation.boid_clean.val += 1;
+        simulation.velocity_weight.val += VELOCITY_STEP;
+    }
+}
+
+void Fouloscopia::remove_dead(void)
+{
+    for (auto it = simulation.boids->begin(); it != simulation.boids->end(); it++) {
+        if ((*it)->health() == DEAD) {
+            auto copy = *it;
+            it = simulation.boids->erase(it);
+            delete copy;
+            simulation.boid_infected.val -= 1;
+            simulation.boid_dead.val += 1;
+            simulation.velocity_weight.val -= VELOCITY_STEP;
+        }
     }
 }
 
@@ -244,8 +259,8 @@ void Fouloscopia::run()
         dynamic_health_information(); // display boid health information
         dynamic_simulation_information(); // display the dynamic information for the user
         handle_input(); // handle user inputs
+        remove_dead();
         winDisplay();
-        // delay(10);
     }
 
     winQuit();

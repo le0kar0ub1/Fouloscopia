@@ -47,6 +47,11 @@ void Boid::set_pos(float x, float y)
     _pos.set(x, y);
 }
 
+enum BOID_HEALTH_STATE Boid::health(void) const
+{
+    return (_health.state);
+}
+
 void Boid::set_health(enum BOID_HEALTH_STATE state)
 {
     _health.state = state;
@@ -301,13 +306,7 @@ void Boid::update_health()
     // All the probabilities are weighted by the disease time and update call to get as close as possible to the usual usage of r0 etc...
     if (_health.state == INFECTED) {
         if (propagation_random(1000, simulation.deathrate.val / (simulation.infection_duration.val * HEALTH_STEP))) { // die if the life isn't nice
-            auto it = std::find(simulation.boids->begin(), simulation.boids->end(), &(*this));
-            if (it != simulation.boids->end()) {
-                delete *it;
-                simulation.boids->erase(it);
-            }
-            simulation.boid_infected.val -= 1;
-            simulation.boid_dead.val += 1;
+            _health.state = DEAD;
         } else if (_health.infected_clock++ == (simulation.infection_duration.val * HEALTH_STEP)) { // cure if the life is nice and become IMMUNE or CLEAN depend of the immunity weight
             _health.infected_clock = 0;
             simulation.boid_infected.val -= 1;
