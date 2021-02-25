@@ -17,17 +17,20 @@ public:
     Complex(Point p);
     Complex(): _x(0), _y(0) {};
     Complex(float radius, float deg);
-    float get_angle(void) const;
-    float get_radius(void) const;
-    float get_distance(const Complex &b) const;
-    Complex stage(float stage) const;
-    Complex normalize() const;
+    ~Complex();
+
     float x() const;
     float y() const;
     void set_x(float x);
     void set_y(float y);
     void set(float x, float y);
-    ~Complex();
+
+    float get_angle(void) const;
+    float get_radius(void) const;
+    float get_distance(const Complex &b) const;
+
+    Complex stage(float stage) const;
+    Complex normalize() const;
 private:
     float _x;
     float _y;

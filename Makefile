@@ -6,7 +6,7 @@ TARGET	:=	fouloscopia.bin
 
 BUILDIR	:=	target
 
-INCLUDE	:=	$(addprefix -I, $(target) mktoolchain/toolchain/include)
+INCLUDE	:=	$(addprefix -I, mktoolchain/toolchain/include)
 
 CXXFLAGS :=	    $(INCLUDE)		    \
 				-Wall 				\
@@ -24,18 +24,15 @@ LDFLAGS	:=  -L mktoolchain/toolchain/libs    		    	\
 EXTSRC := cpp
 EXTOBJ := o
 
-SRC :=	$(wildcard src/$(target)/*.$(EXTSRC) src/$(target)/**/*.$(EXTSRC))
+SRC :=	$(wildcard src/*.$(EXTSRC) src/**/*.$(EXTSRC))
 
-OBJ := 	$(patsubst src/$(target)/%.$(EXTSRC), $(BUILDIR)/%.$(EXTOBJ), $(SRC))
+OBJ := 	$(patsubst src/%.$(EXTSRC), $(BUILDIR)/%.$(EXTOBJ), $(SRC))
 
 .PHONY: all run build clean install
 
 build: $(TARGET)
 
 all: build
-
-project:
-	@mkdir -p $(target)
 
 $(TARGET): $(OBJ)
 	@$(CXX) -o $(TARGET) $(OBJ) $(LDFLAGS)
@@ -44,7 +41,7 @@ $(TARGET): $(OBJ)
 clean:
 	@rm -rf $(BUILDIR) *.bin
 
-$(BUILDIR)/%.$(EXTOBJ): src/$(target)/%.$(EXTSRC)
+$(BUILDIR)/%.$(EXTOBJ): src/%.$(EXTSRC)
 	@mkdir -p $(shell dirname $@)
 	@$(CXX) $(CXXFLAGS) -c $< -o $@
 	@-echo -e "    CXX      $@"
