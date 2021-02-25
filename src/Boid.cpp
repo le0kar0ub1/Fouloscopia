@@ -62,6 +62,9 @@ void Boid::set_color(Color color)
     _color = color;
 }
 
+/**
+ * Draw a bird oriented by the velocity or the degree while not grouping
+ */
 void Boid::draw() const
 {
     int deg = 0;

@@ -1,12 +1,18 @@
 # include "Complex.hpp"
 # include <math.h>
 
+/**
+ * Complex init cartesian
+ */
 Complex::Complex(Point p)
 {
     _x = p.x;
     _y = p.y;
 }
 
+/**
+ * Complex init polar
+ */
 Complex::Complex(float radius, float deg)
 {
     _x = radius * (float)cos(deg / 180.0 * M_PI);
@@ -91,11 +97,17 @@ float Complex::get_radius(void) const
     return ((float)sqrt(pow(_x, 2) + pow(_y, 2)));
 }
 
+/**
+ * Get the distance between the two complex
+ */
 float Complex::get_distance(const Complex &b) const
 {
     return ((float)sqrt(pow(_x - b.x(), 2) + pow(_y - b.y(), 2)));
 }
 
+/**
+ * Stage the complex by the given real
+ */
 Complex Complex::stage(float stage) const
 {
     float rad = get_radius();
@@ -106,6 +118,9 @@ Complex Complex::stage(float stage) const
     return (*this);
 }
 
+/**
+ * Basicaly normalize the complex (in fact the vector)
+ */
 Complex Complex::normalize() const
 {
     float rad = get_radius();

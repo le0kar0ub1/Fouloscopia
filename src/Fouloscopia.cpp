@@ -19,6 +19,9 @@ Fouloscopia::~Fouloscopia()
     delete boids;
 }
 
+/**
+ * Initialize the graphic and infect the first boid 
+ */
 void Fouloscopia::init()
 {
     winInit("Fouloscopia", MAX_X * 2, MAX_Y * 2);
@@ -92,6 +95,9 @@ void Fouloscopia::handle_input()
         if (focus->val >= focus->mod)
             focus->val -= focus->mod;
 
+    /**
+     * Drop new clean boids 
+     */
     if (isMousePressed(SDL_BUTTON_LEFT) && simulation.boids->size() < BOID_MAX_NUMBER) {
         int x, y;
         mousePos(x, y);
@@ -103,6 +109,9 @@ void Fouloscopia::handle_input()
     }
 }
 
+/**
+ * Remove the deads boids from the current loop
+ */
 void Fouloscopia::remove_dead(void)
 {
     for (auto it = simulation.boids->begin(); it != simulation.boids->end(); it++) {
@@ -186,7 +195,7 @@ void Fouloscopia::dynamic_simulation_information(void)
 }
 
 /**
- * Dysplay dynamic information about the boid health
+ * Display dynamic information about the boid health
  */
 void Fouloscopia::dynamic_health_information(void)
 {
@@ -227,6 +236,9 @@ void Fouloscopia::dynamic_health_information(void)
     dynamic_information_focus(110 + 135 + 50 + 170, MAX_Y * 2 - 16 * 1 - 2, &infection_duration);
 }
 
+/**
+ * Main loop of the simulation
+ */
 void Fouloscopia::run()
 {
     int clock = 0;
