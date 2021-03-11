@@ -24,17 +24,6 @@ Boid::Boid(const Boid &p2)
     _health.infected_clock = p2._health.infected_clock;
 }
 
-void Boid::operator=(Boid const &p2)
-{
-    _pos = p2._pos;
-    _deg = p2._deg;
-    _color = p2._color;
-    _velocity = p2._velocity;
-    _acc = p2._acc;
-    _health.state = p2._health.state;
-    _health.infected_clock = p2._health.infected_clock;
-}
-
 Boid::~Boid() {}
 
 Complex Boid::pos(void) const

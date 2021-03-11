@@ -214,7 +214,7 @@ void Fouloscopia::dynamic_health_information(void)
     color(0, 255, 0, 255);
     rectangleFill(0, MAX_Y * 2 - 16 * 3 - 2, 16, MAX_Y * 2 - 16 * 3 - 2 + 16);
     color(120, 144, 156, 255);
-    print(0 + 20, MAX_Y * 2 - 16 * 3 - 2, "Immune: ");
+    print(0 + 20, MAX_Y * 2 - 16 * 3 - 2, "Immuned: ");
     dynamic_information_focus(80 + 20, MAX_Y * 2 - 16 * 3 - 2, &boid_immune);
 
     color(0, 0, 0, 0);
@@ -265,13 +265,13 @@ void Fouloscopia::run()
             }
             (*it)->draw();
         }
-        if (healthtrigger) {
+        if (healthtrigger) { // desengage healthtrigger if it has been updated for this loop
             healthtrigger = false;
         }
+        remove_dead(); // remove dead boids for the precedent update loop
         dynamic_health_information(); // display boid health information
         dynamic_simulation_information(); // display the dynamic information for the user
         handle_input(); // handle user inputs
-        remove_dead();
         winDisplay();
     }
 

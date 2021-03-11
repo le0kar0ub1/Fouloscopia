@@ -4,8 +4,6 @@ Fouloscopia is a little Boids-like implementation with runtime parametring. On t
 
 The project is led using the `GrAPiC` graphic library provided by [Alexandre Meyer](https://perso.liris.cnrs.fr/alexandre.meyer/grapic/html/index.html).
 
-The code is dirty as f***, it is built under hard constraint, will revamp it later.
-
 ## Dependencies
 
 * make
